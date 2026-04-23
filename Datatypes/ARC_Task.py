@@ -1,19 +1,8 @@
 from dataclasses import dataclass
 import numpy as np
 
-ARC_COLORS = {
-    0: "\033[48;2;0;0;0m",        # Black (background)
-    1: "\033[48;2;0;116;217m",    # Blue
-    2: "\033[48;2;255;65;54m",    # Red
-    3: "\033[48;2;46;204;64m",    # Green
-    4: "\033[48;2;255;220;0m",    # Yellow
-    5: "\033[48;2;170;170;170m",  # Grey
-    6: "\033[48;2;240;18;190m",   # Pink
-    7: "\033[48;2;255;133;27m",   # Orange
-    8: "\033[48;2;127;219;255m",  # Azure
-    9: "\033[48;2;135;12;37m",    # Maroon
-}
-Reset_Color = "\033[0m"
+from Datatypes.PrimitiveDatatypes import Printing_Colors
+
 
 @dataclass
 class ColorMatrix:
@@ -31,7 +20,7 @@ class ColorMatrix:
         for row in self.matrix:
             row_string = ""
             for value in row:
-                row_string += f"{ARC_COLORS[value]}   {Reset_Color}"
+                row_string += f"{Printing_Colors[value]}   {Printing_Colors[10]}"
             string += row_string + "\n"
         return string
 

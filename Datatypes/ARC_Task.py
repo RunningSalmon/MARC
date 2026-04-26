@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 import numpy as np
 
-from Datatypes.PrimitiveDatatypes import Printing_Colors
+from Datatypes.Primitive_Datatypes import Printing_Colors
 
 
 @dataclass
-class ColorMatrix:
+class ColorMatrix():
     """A Matrix consisting of the 10 ARC-Colors"""
     valid_values = set(range(10))
     matrix: np.ndarray
@@ -26,6 +26,9 @@ class ColorMatrix:
 
     def __repr__(self):
         return f"Matrix:\n{self.__str__}"
+
+    def shape(self):
+        return self.matrix.shape
 
 @dataclass
 class MatrixPair:

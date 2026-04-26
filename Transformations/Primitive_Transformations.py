@@ -2,7 +2,7 @@
 import numpy as np
 
 from Datatypes.Abstract_Object import *
-from Datatypes.PrimitiveDatatypes import *
+from Datatypes.Primitive_Datatypes import *
 
 def translate(abstract_object: AbstractObject, direction: Direction):
     match direction:

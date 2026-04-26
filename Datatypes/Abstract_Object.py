@@ -1,6 +1,6 @@
 import numpy as np
 
-from Datatypes.PrimitiveDatatypes import *
+from Datatypes.Primitive_Datatypes import *
 from Datatypes.ARC_Task import *
 
 class AbstractObject:

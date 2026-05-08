@@ -16,14 +16,19 @@ def translate(abstract_object: AbstractObject, direction: Direction):
             abstract_object.Position_X += 1
 
 
+def mirror_matrix(matrix: np.ndarray, axis: Axis):
+    return np.flip(matrix, axis.value)
+
 def mirror(abstract_object: AbstractObject, axis: Axis):
     shape_matrix = abstract_object.Shape
-    abstract_object.Shape = np.flip(shape_matrix, axis.value)
+    abstract_object.Shape = mirror_matrix(shape_matrix, axis)
 
+def rotate_matrix(matrix: np.ndarray, degree: Degree):
+    return np.rot90(matrix, degree.value)
 
 def rotate(abstract_object: AbstractObject, degree: Degree):
     shape_matrix = abstract_object.Shape
-    abstract_object.Shape = np.rot90(shape_matrix, degree.value)
+    abstract_object.Shape = rotate_matrix(shape_matrix, degree)
 
 def duplicate(abstract_object: AbstractObject, direction: Direction):
     shape_matrix = abstract_object.Shape

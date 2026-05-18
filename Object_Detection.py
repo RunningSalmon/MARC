@@ -4,9 +4,9 @@ from Datatypes.ARC_Task import *
 from Datatypes.Abstract_Object import *
 
 
-def extract_objects(matrix: ColorMatrix):
-    matrix = copy.copy(matrix)
-    matrix_height, matrix_width = matrix.shape
+def extract_objects(color_matrix: ColorMatrix):
+    matrix = copy.copy(color_matrix.matrix)
+    matrix_height, matrix_width = color_matrix.shape
     objects = []
     for (r, c), val in np.ndenumerate(matrix):
         if val != 0:
@@ -42,3 +42,5 @@ def extract_objects(matrix: ColorMatrix):
                 object_shape[x][y] = 1
             abstract_object = AbstractObject((row_min, col_min), object_shape, obj_color)
             objects.append(abstract_object)
+
+    return objects

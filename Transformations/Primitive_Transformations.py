@@ -30,22 +30,23 @@ def rotate(abstract_object: AbstractObject, degree: Degree):
     shape_matrix = abstract_object.Shape
     abstract_object.Shape = rotate_matrix(shape_matrix, degree)
 
-def duplicate(abstract_object: AbstractObject, direction: Direction):
-    shape_matrix = abstract_object.Shape
+def duplicate_matrix(matrix: np.ndarray, direction: Direction):
     duplicate_direction = None
-    match direction:
-        case Direction.Up:
-            duplicate_direction = (2, 1)
-            abstract_object.Position_Y -= abstract_object.height
-        case Direction.Down:
-            duplicate_direction = (2, 1)
-        case Direction.Left:
-            duplicate_direction = (1, 2)
-            abstract_object.Position_X -= abstract_object.width
-        case Direction.Right:
-            duplicate_direction = (1, 2)
+    if direction == Direction.Up or direction == Direction.Down:
+        duplicate_direction = (2, 1)
 
-    abstract_object.Shape = np.tile(shape_matrix, duplicate_direction)
+    elif direction == Direction.Left or direction.Right:
+        duplicate_direction = (1,2)
+
+    return np.tile(matrix, duplicate_direction)
+
+def duplicate(abstract_object: AbstractObject, direction: Direction):
+    if Direction.Up:
+        abstract_object.Position_Y -= abstract_object.height
+    elif Direction.Left:
+        abstract_object.Position_X -= abstract_object.width
+
+    abstract_object.Shape = duplicate_matrix(abstract_object.Shape, direction)
 
 def recolor(abstract_object: AbstractObject, color: ArcColor):
     abstract_object.Color = color

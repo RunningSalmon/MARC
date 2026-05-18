@@ -17,6 +17,10 @@ class AbstractObjectMatrixPair:
     output = AbstractObjectMatrix
     pairing = {}
 
+    def __init__(self, abstract_input: AbstractObjectMatrix, abstract_output: AbstractObjectMatrix):
+        self.input = abstract_input
+        self.output = abstract_output
+
     def __str__(self):
         return (f"AbstractObjectMatrixPair with Input:\n{self.input},\n "
                 f"and Output:\n {self.output}\n")
@@ -24,6 +28,10 @@ class AbstractObjectMatrixPair:
 class AbstractARCTask:
     train: list[AbstractObjectMatrixPair]
     test: list[AbstractObjectMatrixPair]
+
+    def __init__(self, train: list[AbstractObjectMatrixPair], test: list[AbstractObjectMatrixPair]):
+        self.train = train
+        self.test = test
 
     def __repr__(self):
         return (f"AbstractObjectARCTask(\n"

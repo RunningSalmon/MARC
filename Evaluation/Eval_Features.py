@@ -12,6 +12,8 @@ def eval_position(obj_1: AbstractObject, obj_2: AbstractObject, matrix_shape: tu
     return 1-relative_distance
 
 def eval_shape_matrix(matrix_1: np.ndarray, matrix_2: np.ndarray):
+    if matrix_1.shape != matrix_2.shape:
+        return 0
     matrix_1_count = 0
     similarity_count = 0
     for i in range(matrix_1.shape[0]):

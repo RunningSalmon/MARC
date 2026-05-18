@@ -30,6 +30,12 @@ class AbstractObjectMatrixPair:
         return (f"AbstractObjectMatrixPair with Input:\n{self.input},\n "
                 f"and Output:\n {self.output}\n")
 
+    def print_pairing(self):
+        if self.pairing:
+            for id1, id2 in self.pairing.items():
+                print(f"{id1} - {id2}")
+
+
 class AbstractARCTask:
     train: list[AbstractObjectMatrixPair]
     test: list[AbstractObjectMatrixPair]

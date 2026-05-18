@@ -5,7 +5,7 @@ from Datatypes.Primitive_Datatypes import Printing_Colors
 
 
 @dataclass
-class ColorMatrix():
+class ColorMatrix:
     """A Matrix consisting of the 10 ARC-Colors"""
     valid_values = set(range(10))
     matrix: np.ndarray

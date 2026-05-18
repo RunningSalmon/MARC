@@ -22,12 +22,30 @@ def eval_shape_matrix(matrix_1: np.ndarray, matrix_2: np.ndarray):
                     similarity_count += 1
     return similarity_count / matrix_1_count
 
-def eval_shape(obj_1: AbstractObject, obj_2: AbstractObject):
+def eval_shape_duplicated(obj_1: AbstractObject, obj_2: AbstractObject):
     if obj_1.height != obj_2.height or obj_1.width != obj_2.width:
         return 0
     obj_1_shape_matrix = obj_1.Shape
     obj_2_shape_matrix = obj_2.Shape
-    return eval_shape_matrix(obj_1_shape_matrix, obj_2_shape_matrix)
+    fitness = []
+
+    # duplicate up
+    obj_1_transformed_matrix = duplicate_matrix(obj_1_shape_matrix, Direction.Up)
+    fitness.append(eval_shape_matrix(obj_1_transformed_matrix, obj_2_shape_matrix))
+
+    # duplicate down
+    obj_1_transformed_matrix = duplicate_matrix(obj_1_shape_matrix, Direction.Down)
+    fitness.append(eval_shape_matrix(obj_1_transformed_matrix, obj_2_shape_matrix))
+
+    # duplicate left
+    obj_1_transformed_matrix = duplicate_matrix(obj_1_shape_matrix, Direction.Left)
+    fitness.append(eval_shape_matrix(obj_1_transformed_matrix, obj_2_shape_matrix))
+
+    # duplicate right
+    obj_1_transformed_matrix = duplicate_matrix(obj_1_shape_matrix, Direction.Right)
+    fitness.append(eval_shape_matrix(obj_1_transformed_matrix, obj_2_shape_matrix))
+
+    return max(fitness)
 
 def eval_rotated_shape(obj_1: AbstractObject, obj_2: AbstractObject):
     obj_1_shape_matrix = obj_1.Shape

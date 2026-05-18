@@ -15,6 +15,7 @@ class AbstractObjectMatrix:
 class AbstractObjectMatrixPair:
     input = AbstractObjectMatrix
     output = AbstractObjectMatrix
+    pairing = {}
 
     def __str__(self):
         return (f"AbstractObjectMatrixPair with Input:\n{self.input},\n "

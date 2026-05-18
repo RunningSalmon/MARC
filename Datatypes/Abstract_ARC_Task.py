@@ -1,4 +1,4 @@
-from Abstract_Object import *
+from Datatypes.Abstract_Object import *
 
 class AbstractObjectMatrix:
     height: int
@@ -10,11 +10,16 @@ class AbstractObjectMatrix:
         self.abstract_objects = abstract_objects
 
     def __str__(self):
-        return f"An Abstract Matrix of Height: {self.height}, Width: {self.width}, containing the abstract objects {self.abstract_objects}"
+        objects_str = ""
+        for i, obj in enumerate(self.abstract_objects):
+            objects_str += str(obj)
+            if i < len(self.abstract_objects) - 1:
+                objects_str += "and\n"
+        return f"An Abstract Matrix of Height: {self.height}, Width: {self.width}, containing:\n{objects_str}"
 
 class AbstractObjectMatrixPair:
-    input = AbstractObjectMatrix
-    output = AbstractObjectMatrix
+    input: AbstractObjectMatrix
+    output: AbstractObjectMatrix
     pairing = {}
 
     def __init__(self, abstract_input: AbstractObjectMatrix, abstract_output: AbstractObjectMatrix):
@@ -34,8 +39,8 @@ class AbstractARCTask:
         self.test = test
 
     def __repr__(self):
+        train_str = "\n".join(str(pair) for pair in self.train)
+        test_str = "\n".join(str(pair) for pair in self.test)
         return (f"AbstractObjectARCTask(\n"
-                f"train:\n"
-                f"{self.train},\n"
-                f" test:\n"
-                f"{self.test}\n)")
+                f"train:\n{train_str},\n"
+                f"test:\n{test_str}\n)")

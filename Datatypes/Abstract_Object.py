@@ -1,8 +1,6 @@
 import numpy as np
 
 from Datatypes.Primitive_Datatypes import *
-from Datatypes.ARC_Task import *
-
 class AbstractObject:
     Position_X: int
     Position_Y: int
@@ -20,12 +18,20 @@ class AbstractObject:
         self.Color = color
 
     def __str__(self):
-        base = np.zeros(self.Shape.shape)
+        colored_matrix = np.zeros(self.Shape.shape)
         for row, arr in enumerate(self.Shape):
             for col, val in enumerate(arr):
                 if val == 1:
-                    base[row, col] = self.Color.value
+                    colored_matrix[row, col] = self.Color
 
-        return (f"Abstract Object with Position {self.Position_X}, {self.Position_Y};\n"
-                f"and Colored Shape: \n{str(ColorMatrix(base))}\n"
-                f"width: {self.width}, height: {self.height}")
+        string = ""
+        for row in colored_matrix:
+            row_string = ""
+            for value in row:
+                row_string += f"{Printing_Colors[int(value)]}   {Printing_Colors[10]}"
+            string += row_string + "\n"
+
+        return string
+
+    def __repr__(self):
+        return f"Object:\n{self.__str__}"

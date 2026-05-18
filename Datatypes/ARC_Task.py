@@ -1,10 +1,12 @@
+import copy
 from dataclasses import dataclass
 import numpy as np
 
 from Datatypes.Abstract_ARC_Task import AbstractObjectMatrix, AbstractObjectMatrixPair, AbstractARCTask
-from Object_Detection import *
 import json
-from dataclasses import dataclass
+
+from Datatypes.Abstract_Object import AbstractObject
+from Datatypes.Primitive_Datatypes import Printing_Colors
 
 
 @dataclass
@@ -33,8 +35,49 @@ class ColorMatrix:
     def shape(self):
         return self.matrix.shape
 
+    def extract_abstract_objects(self):
+        matrix = copy.copy(self.matrix)
+        matrix_height, matrix_width = self.shape()
+        objects = []
+        for (r, c), val in np.ndenumerate(matrix):
+            if val != 0:
+                to_visit = [(r, c)]
+                obj_coordinates = []
+                obj_color = val
+                row_min = r
+                row_max = r
+                col_min = c
+                col_max = c
+                while len(to_visit) > 0:
+                    current = to_visit.pop(0)
+                    current_row, current_col = current
+                    if current not in obj_coordinates and matrix[current_row][current_col] == obj_color:
+                        obj_coordinates.append(current)
+                        matrix[current_row][current_col] = 0
+
+                        row_min = min(row_min, current_row)
+                        row_max = max(row_max, current_row)
+                        col_min = min(col_min, current_col)
+                        col_max = max(col_max, current_col)
+
+                        if current_row > 0:
+                            to_visit.append((current_row - 1, current_col))
+                        if current_row < matrix_height-1:
+                            to_visit.append((current_row + 1, current_col))
+                        if current_col > 0:
+                            to_visit.append((current_row, current_col - 1))
+                        if current_col < matrix_width-1:
+                            to_visit.append((current_row, current_col + 1))
+                object_shape = np.zeros((row_max - row_min + 1, col_max - col_min + 1))
+                for x, y in obj_coordinates:
+                    object_shape[x - row_min][y - col_min] = 1
+                abstract_object = AbstractObject((row_min, col_min), object_shape, obj_color)
+                objects.append(abstract_object)
+
+        return objects
+
     def to_abstract_matrix(self):
-        objects = extract_objects(self)
+        objects = self.extract_abstract_objects()
         height, width = self.shape()
         abstract_matrix = AbstractObjectMatrix(height, width, objects)
         return abstract_matrix
@@ -85,7 +128,7 @@ class ARCTask:
 def load_arc_task_from_json(json_file: str, path = str) -> ARCTask:
     """Load a MatrixDataset from an ARC_Problem_Interface JSON file."""
 
-    with open(f"{path}.{json_file}", "r") as f:
+    with open(f"{path}/{json_file}", "r") as f:
         data = json.load(f)
 
     def to_array(matrix: list[list[int]]) -> np.ndarray:

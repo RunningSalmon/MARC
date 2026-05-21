@@ -1,3 +1,5 @@
+from typing import Optional
+
 from Datatypes.Abstract_ARC_Task import AbstractObjectMatrix, AbstractObjectMatrixPair
 from Datatypes.Abstract_Object import AbstractObject
 from Datatypes.Primitive_Datatypes import Direction
@@ -7,12 +9,19 @@ from Evaluation.Eval_Features import eval_shape_duplicated
 
 
 class ShapeDuplication(Feature):
-    direction: Direction
+    direction: Optional[Direction]
 
-    def __init__(self, direction: Direction):
+    nr_of_algos = 4
+
+    def __init__(self, direction: Optional[Direction] = None):
         self.direction = direction
 
+    def __repr__(self):
+        return f"Feature 'Duplicate' with parameter: {self.direction}"
+
     def transform(self, abstract_matrix: AbstractObjectMatrix):
+        if self.direction is None:
+            raise ValueError("cannot invoke transform without parameterization")
         for abstract_object in abstract_matrix.abstract_objects:
             duplicate(abstract_object, self.direction)
 

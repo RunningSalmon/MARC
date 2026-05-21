@@ -11,22 +11,19 @@ def eval_position(obj_1: AbstractObject, obj_2: AbstractObject, matrix_shape: tu
     relative_distance = np.linalg.norm(relative_distance_vec)
     return 1-relative_distance
 
+
 def eval_shape_matrix(matrix_1: np.ndarray, matrix_2: np.ndarray):
     if matrix_1.shape != matrix_2.shape:
-        return 0
-    matrix_1_count = 0
-    similarity_count = 0
-    for i in range(matrix_1.shape[0]):
-        for j in range(matrix_1.shape[1]):
-            if matrix_1[i][j] == 1:
-                matrix_1_count += 1
-                if matrix_2[i][j] == 1:
-                    similarity_count += 1
-    return similarity_count / matrix_1_count
+        return 0.0
+
+    intersection = np.sum((matrix_1 == 1) & (matrix_2 == 1))
+    union = np.sum((matrix_1 == 1) | (matrix_2 == 1))
+
+    if union == 0:
+        return 0.0
+    return intersection/union
 
 def eval_shape_duplicated(obj_1: AbstractObject, obj_2: AbstractObject):
-    if obj_1.height != obj_2.height or obj_1.width != obj_2.width:
-        return 0
     obj_1_shape_matrix = obj_1.Shape
     obj_2_shape_matrix = obj_2.Shape
     fitness = []

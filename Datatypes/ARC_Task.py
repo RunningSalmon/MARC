@@ -6,7 +6,7 @@ from Datatypes.Abstract_ARC_Task import AbstractObjectMatrix, AbstractObjectMatr
 import json
 
 from Datatypes.Abstract_Object import AbstractObject
-from Datatypes.Primitive_Datatypes import Printing_Colors
+from Datatypes.Primitive_Datatypes import Printing_Colors, ArcColor
 
 
 @dataclass
@@ -36,14 +36,14 @@ class ColorMatrix:
         return self.matrix.shape
 
     def extract_abstract_objects(self):
-        matrix = copy.copy(self.matrix)
+        matrix = copy.deepcopy(self.matrix)
         matrix_height, matrix_width = self.shape()
         objects = []
-        for (r, c), val in np.ndenumerate(matrix):
-            if val != 0:
+        for (r, c), color in np.ndenumerate(matrix):
+            if color != 0:
                 to_visit = [(r, c)]
                 obj_coordinates = []
-                obj_color = val
+                obj_color = color
                 row_min = r
                 row_max = r
                 col_min = c
@@ -71,7 +71,8 @@ class ColorMatrix:
                 object_shape = np.zeros((row_max - row_min + 1, col_max - col_min + 1))
                 for x, y in obj_coordinates:
                     object_shape[x - row_min][y - col_min] = 1
-                abstract_object = AbstractObject((row_min, col_min), object_shape, obj_color)
+                abstract_object = AbstractObject((row_min, col_min), object_shape, ArcColor(obj_color))
+                #print(f"Found object: color={obj_color}, pos=({row_min},{col_min}), shape={object_shape.shape}")
                 objects.append(abstract_object)
 
         return objects

@@ -17,14 +17,30 @@ class AbstractObjectMatrix:
                 objects_str += "and\n"
         return f"An Abstract Matrix of Height: {self.height}, Width: {self.width}, containing:\n{objects_str}"
 
+    def __eq__(self, other):
+        return np.array_equal(self.to_matrix(), other.to_matrix())
+
+    def to_matrix(self):
+        color_matrix = np.zeros((self.height, self.width))
+        for obj in self.abstract_objects:
+            obj_height, obj_width = obj.Shape_Matrix.shape
+            x, y = obj.Position_X, obj.Position_Y
+            for i in range(0, obj_height):
+                for j in range(0, obj_width):
+                    if obj.Shape_Matrix[i][j] == 1 and i+y <= self.height - 1 and j+x <= self.width - 1 and x >= 0 and y >= 0:
+                        color_matrix[i+y][j+x] = obj.Color.value
+        return color_matrix
+
 class AbstractObjectMatrixPair:
     input: AbstractObjectMatrix
     output: AbstractObjectMatrix
     pairing = {}
 
-    def __init__(self, abstract_input: AbstractObjectMatrix, abstract_output: AbstractObjectMatrix):
+    def __init__(self, abstract_input: AbstractObjectMatrix, abstract_output: AbstractObjectMatrix, object_pairing = None):
         self.input = abstract_input
         self.output = abstract_output
+        if object_pairing:
+            self.pairing = object_pairing
 
     def __str__(self):
         return (f"AbstractObjectMatrixPair with Input:\n{self.input},\n "

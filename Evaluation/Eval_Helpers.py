@@ -1,31 +1,25 @@
-from Datatypes.Abstract_Object import *
 from Transformations.Primitive_Transformations import *
 
-
-def eval_color(obj_1: AbstractObject, obj_2: AbstractObject):
-    return 1 if obj_1.Color == obj_2.Color else 0
-
-def eval_position(obj_1: AbstractObject, obj_2: AbstractObject, matrix_shape: tuple[int, int]):
-    distance_vec = (obj_2.Position_Y - obj_1.Position_Y, obj_2.Position_X - obj_1.Position_X)
-    relative_distance_vec = (distance_vec[0]/matrix_shape[0], distance_vec[1]/matrix_shape[1])
-    relative_distance = np.linalg.norm(relative_distance_vec)
-    return 1-relative_distance
-
-
 def eval_shape_matrix(matrix_1: np.ndarray, matrix_2: np.ndarray):
-    if matrix_1.shape != matrix_2.shape:
-        return 0.0
+    matrix_1_shape = matrix_1.shape
+    matrix_2_shape = matrix_2.shape
+    min_height = min(matrix_1_shape[0], matrix_2_shape[0])
+    min_width = min(matrix_1_shape[1], matrix_2_shape[1])
+    max_height = max(matrix_1_shape[0], matrix_2_shape[0])
+    max_width = max(matrix_1_shape[1], matrix_2_shape[1])
 
-    intersection = np.sum((matrix_1 == 1) & (matrix_2 == 1))
-    union = np.sum((matrix_1 == 1) | (matrix_2 == 1))
+    similarity_count = 0
 
-    if union == 0:
-        return 0.0
-    return intersection/union
+    for i in range(min_height):
+        for j in range(min_width):
+            if matrix_1[i][j] == matrix_2[i][j]:
+                similarity_count += 1
+
+    return similarity_count/(max_height*max_width)
 
 def eval_shape_duplicated(obj_1: AbstractObject, obj_2: AbstractObject):
-    obj_1_shape_matrix = obj_1.Shape
-    obj_2_shape_matrix = obj_2.Shape
+    obj_1_shape_matrix = obj_1.Shape_Matrix
+    obj_2_shape_matrix = obj_2.Shape_Matrix
     fitness = []
 
     # duplicate up
@@ -47,8 +41,8 @@ def eval_shape_duplicated(obj_1: AbstractObject, obj_2: AbstractObject):
     return max(fitness)
 
 def eval_rotated_shape(obj_1: AbstractObject, obj_2: AbstractObject):
-    obj_1_shape_matrix = obj_1.Shape
-    obj_2_shape_matrix = obj_2.Shape
+    obj_1_shape_matrix = obj_1.Shape_Matrix
+    obj_2_shape_matrix = obj_2.Shape_Matrix
     fitness = []
 
     # 90deg
@@ -64,8 +58,8 @@ def eval_rotated_shape(obj_1: AbstractObject, obj_2: AbstractObject):
     return max(fitness)
 
 def eval_mirrored_shape(obj_1: AbstractObject, obj_2: AbstractObject):
-    obj_1_shape_matrix = obj_1.Shape
-    obj_2_shape_matrix = obj_2.Shape
+    obj_1_shape_matrix = obj_1.Shape_Matrix
+    obj_2_shape_matrix = obj_2.Shape_Matrix
     fitness = []
 
     # Horizontal

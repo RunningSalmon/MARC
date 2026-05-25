@@ -48,8 +48,11 @@ class AbstractObjectMatrixPair:
 
     def print_pairing(self):
         if self.pairing:
+            input_objects = self.input.abstract_objects
+            output_objects = self.output.abstract_objects
+
             for id1, id2 in self.pairing.items():
-                print(f"{id1} - {id2}")
+                print(f"Pairing {id1}: \n{input_objects[id1]}\n {output_objects[id2]}")
 
 
 class AbstractARCTask:

@@ -35,10 +35,10 @@ if __name__ == '__main__':
     # recolor(abstract_object, ArcColor.Azure)
     # print(abstract_object)
 
-    task = load_arc_task_from_json("Mirror_Horizontal.json", "ARC_Generator_JSONs")
+    task = load_arc_task_from_json("Rotate90+DuplicateDown.json", "ARC_Generator_JSONs")
     abstracted_task = task.to_abstract_task()
     print(task)
-    #print(abstracted_task)
+    print(abstracted_task)
     #first_input_color_matrix = task.test[0].input
     #print(first_input_color_matrix)
 
@@ -48,11 +48,21 @@ if __name__ == '__main__':
                        Mirror(),
                        Rotate()]
     eval_features = [FeatureColor(),
-                         FeaturePosition(),
-                         FeatureShape()]
+                     FeaturePosition(),
+                     FeatureShape()]
+
+    #train = abstracted_task.train
+    #for matrix_pair in train:
+    #    matrix_pair.pairing = create_object_mapping(matrix_pair, eval_features, transformations)
+    #    Rotate().transform(matrix_pair.input, RotationParameter(Degree.Deg90))
+    #    print(matrix_pair)
+    #    score_shape = evaluate_abstract_matrix_pair(matrix_pair, [FeatureShape()])
+    #    print(score_shape)
+
 
     solution, visited = mdl_search(abstracted_task, transformations, eval_features)
     print(f"found solution: {solution}. visited:\n{visited}")
+
 
     #print(first_input)
     #print(ColorMatrix(first_input.to_matrix()))

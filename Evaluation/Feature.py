@@ -3,7 +3,7 @@ from Datatypes.Abstract_ARC_Task import *
 
 class Feature(ABC):
     @abstractmethod
-    def evaluate_objects(self, abstract_object_1: AbstractObject, abstract_object_2: AbstractObject) -> float:
+    def evaluate_objects(self, abstract_object_1: AbstractObject, abstract_object_2: AbstractObject, matrix_shape: tuple[int, int]) -> float:
         pass
 
     def evaluate_abstract_matrix_pair(self, abstract_matrix_pair: AbstractObjectMatrixPair):
@@ -18,6 +18,6 @@ class Feature(ABC):
             raise(NotImplementedError("evaluate_abstract_matrix_pair needs an object pairing"))
 
         for (input_id, output_id) in abstract_matrix_pair.pairing.items():
-            score += (self.evaluate_objects(input_objects[input_id], output_objects[output_id]))
+            score += (self.evaluate_objects(input_objects[input_id], output_objects[output_id], (input_matrix.height, input_matrix.width)))
 
         return score/len(input_objects)

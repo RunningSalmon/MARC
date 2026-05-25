@@ -18,7 +18,7 @@ def create_object_pairing(abstract_matrix_pair: AbstractObjectMatrixPair):
     matrix_height = input_matrix.height
     matrix_width = input_matrix.width
     relevant_features = [FeatureColor(),
-                         FeaturePosition((matrix_height, matrix_width)),
+                         FeaturePosition(),
                          FeatureShape()]
     input_objects = input_matrix.abstract_objects
     output_objects = output_matrix.abstract_objects
@@ -32,7 +32,7 @@ def create_object_pairing(abstract_matrix_pair: AbstractObjectMatrixPair):
         heap = []
         for i in input_range:
             for j in output_range:
-                current_score = evaluate_abstract_object_pair(input_objects[i], output_objects[j], relevant_features)
+                current_score = evaluate_abstract_object_pair(input_objects[i], output_objects[j], relevant_features, (input_matrix.height, input_matrix.width))
                 heapq.heappush(heap, (-current_score, (i, j)))
 
         input_ids = list(input_range)

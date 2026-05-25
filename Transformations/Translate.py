@@ -19,17 +19,13 @@ class TranslateParameter(FeatureParameter):
 
 
 class Translate(Transformation):
-    matrix_height: int
-    matrix_width: int
     parameters = TranslateParameter.possible_values()
 
-    def __init__(self, matrix_height: int, matrix_width: int, parameter_direction: TranslateParameter = None):
-        self.matrix_height = matrix_height
-        self.matrix_width = matrix_width
+    def __init__(self, parameter_direction: TranslateParameter = None):
         super().__init__(parameter_direction)
 
     def from_parameter(self, parameter: Optional[TranslateParameter] = None) -> 'Translate':
-        return Translate(self.matrix_height, self.matrix_width, parameter)
+        return Translate(parameter)
 
     def transform(self, abstract_matrix: AbstractObjectMatrix, parameter_direction: Optional[TranslateParameter] = None):
         if parameter_direction is None:

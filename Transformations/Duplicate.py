@@ -19,17 +19,13 @@ class DuplicationParameter(FeatureParameter):
         return f"DuplicationParameter({self.direction.name})"
 
 class Duplicate(Transformation):
-    matrix_height: int
-    matrix_width: int
     parameters = DuplicationParameter.possible_values()
 
-    def __init__(self, matrix_height: int, matrix_width: int, direction: DuplicationParameter = None):
-        self.matrix_height = matrix_height
-        self.matrix_width = matrix_width
+    def __init__(self, direction: DuplicationParameter = None):
         super().__init__(direction)
 
     def from_parameter(self, parameter: Optional[DuplicationParameter] = None) -> 'Duplicate':
-        return Duplicate(self.matrix_height, self.matrix_width, parameter)
+        return Duplicate(parameter)
 
     def transform(self, abstract_matrix: AbstractObjectMatrix, direction: Optional[DuplicationParameter] = None):
         if direction is None:

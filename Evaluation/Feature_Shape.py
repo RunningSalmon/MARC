@@ -1,7 +1,7 @@
 from Evaluation.Feature import *
 
 class FeatureShape(Feature):
-    def evaluate_objects(self, abstract_object_1: AbstractObject, abstract_object_2: AbstractObject) -> float:
+    def evaluate_objects(self, abstract_object_1: AbstractObject, abstract_object_2: AbstractObject, matrix_shape: tuple[int, int]) -> float:
         obj_1_shape_matrix = abstract_object_1.Shape_Matrix
         obj_2_shape_matrix = abstract_object_2.Shape_Matrix
         return eval_shape_matrix(obj_1_shape_matrix, obj_2_shape_matrix)

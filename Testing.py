@@ -12,6 +12,35 @@ from Transformations.Mirror import *
 from Transformations.Rotate import *
 from MDL_Search.MDLSearch import *
 
+
+class Transformations(Enum):
+    dup_up = Duplicate(DuplicationParameter(Direction.Up))
+    dup_down = Duplicate(DuplicationParameter(Direction.Down))
+    dup_left = Duplicate(DuplicationParameter(Direction.Left))
+    dup_right = Duplicate(DuplicationParameter(Direction.Right))
+
+    mir_hor = Mirror(MirrorParameter(Axis.Horizontal))
+    mir_ver = Mirror(MirrorParameter(Axis.Vertical))
+
+    rec_1 = Recolor(RecolorParameter(ArcColor(1)))
+    rec_2 = Recolor(RecolorParameter(ArcColor(2)))
+    rec_3 = Recolor(RecolorParameter(ArcColor(3)))
+    rec_4 = Recolor(RecolorParameter(ArcColor(4)))
+    rec_5 = Recolor(RecolorParameter(ArcColor(5)))
+    rec_6 = Recolor(RecolorParameter(ArcColor(6)))
+    rec_7 = Recolor(RecolorParameter(ArcColor(7)))
+    rec_8 = Recolor(RecolorParameter(ArcColor(8)))
+    rec_9 = Recolor(RecolorParameter(ArcColor(9)))
+
+    rot90 = Rotate(RotationParameter(Degree.Deg90))
+    rot180 = Rotate(RotationParameter(Degree.Deg180))
+    rot270 = Rotate(RotationParameter(Degree.Deg270))
+
+    tra_up = Translate(TranslateParameter(Direction.Up))
+    tra_down = Translate(TranslateParameter(Direction.Down))
+    tra_left = Translate(TranslateParameter(Direction.Left))
+    tra_right = Translate(TranslateParameter(Direction.Right))
+
 if __name__ == '__main__':
     # basic_matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     # color_matrix = ColorMatrix(basic_matrix)
@@ -59,18 +88,20 @@ if __name__ == '__main__':
     #    score_shape = evaluate_abstract_matrix_pair(matrix_pair, [FeatureShape()])
     #    print(score_shape)
 
+
+
     template_task_1 = load_arc_task_from_json("Template_Task_1.json", "ARC_Generator_JSONs")
     #print(template_task_1)
     template_task_1 = template_task_1.to_abstract_task()
-    manipulations = [Rotate(RotationParameter(Degree.Deg90))]
+    manipulations = [Transformations.rot90.value, Transformations.rec_1.value, Transformations.dup_up.value,]
     eval_features = [FeatureColor(),
                     FeaturePosition(),
                     FeatureShape()]
-    transformations = [Duplicate(),
-                       Mirror(),
-                       Recolor(),
-                       Rotate(),
-                       Translate(),]
+    transforms = [Duplicate(),
+                  Mirror(),
+                  Recolor(),
+                  Rotate(),
+                  Translate(),]
     manipulate_arc_task(template_task_1, manipulations)
     #print(abstract_task_to_arc_task(template_task_1))
 
@@ -86,8 +117,8 @@ if __name__ == '__main__':
 
 
 
-    solution, visited = mdl_search(template_task_1, transformations, eval_features)
-    print(f"found solution: {solution}. visited:\n{visited}")
+    solution, visited, steps = mdl_search(template_task_1, transforms, eval_features)
+    print(f"found solution:\n {solution}\n in {steps} steps. \nvisited:\n{visited}")
 
 
     #print(first_input)

@@ -33,7 +33,7 @@ class Transformation(ABC):
         if not self.parameters:
             raise ValueError("parameters are not specified")
 
-        class_nll = log(1/nr_of_algos)
+        class_nll = -log(1/nr_of_algos)
         if self.fixed_parameter:
             parameter_nll = 0
         else:

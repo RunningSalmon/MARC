@@ -1,6 +1,5 @@
 import copy
 import heapq
-from multiprocessing.spawn import old_main_modules
 
 from Datatypes.Abstract_ARC_Task import AbstractObjectMatrixPair
 from Evaluation.Object_Mapping import create_object_mapping
@@ -48,14 +47,14 @@ def initialize_mdl_search(abstract_arc_task: AbstractARCTask, transformations: l
                 transform_param_score += score #add to the accumulated transform(param) score
 
             mean_transform_param_score = transform_param_score / len(training_pairs)
-            mdl = nll * mean_transform_param_score
+            mdl = nll * (1-mean_transform_param_score)
             print(transformation, param, mean_transform_param_score, nll, mdl)
             heapq.heappush(heap, HeapItem(mdl, nll, [transformation.from_parameter(param)], transformed_matrices))
             primitive_transformations.append(transformation.from_parameter(param))
 
     return heap, primitive_transformations
 
-def mdl_search_step(abstract_matrix_pair: AbstractARCTask, heap: list, primitive_transformations: list, visited: set, eval_features: list[Feature]):
+def mdl_search_step(abstract_matrix_pair: AbstractARCTask, heap: list, primitive_transformations: list, visited: set, eval_features: list[Feature]) -> tuple[list, set]:
     training_pairs = abstract_matrix_pair.train
     item: HeapItem = heapq.heappop(heap)
     transforms = item.transforms
@@ -63,17 +62,18 @@ def mdl_search_step(abstract_matrix_pair: AbstractARCTask, heap: list, primitive
     # check if sequence already visited else append to visited
     key = tuple(repr(transform) for transform in transforms)
     if key in visited:
-        return heap, visited, None
+        return heap, visited
     visited.add(key)
 
     transformed_matrices = item.transformed_matrices
     transformation_series_mdl = item.mdl
     transformation_series_nll = item.nll
     solved = True
-    transform_score = 0
+
 
     for transformation in primitive_transformations:
         anticipatory_matrices = []
+        transform_score = 0
         for i, abstract_matrix_pair in enumerate(training_pairs):
             transformed_matrix = transformed_matrices[i]
             output_matrix = abstract_matrix_pair.output
@@ -90,42 +90,55 @@ def mdl_search_step(abstract_matrix_pair: AbstractARCTask, heap: list, primitive
 
         mean_transform_score = transform_score / len(training_pairs)
         nll = transformation.get_nll(len(primitive_transformations))
-        new_transformation_series_nll = transformation_series_nll - nll
-        new_transformation_series_mdl = mean_transform_score * new_transformation_series_nll
+        new_transformation_series_nll = transformation_series_nll + nll
+        new_transformation_series_mdl = (1-mean_transform_score) * new_transformation_series_nll
 
         accumulated_transforms = transforms + [transformation]
         heapq.heappush(heap, HeapItem(new_transformation_series_mdl, nll, accumulated_transforms, anticipatory_matrices))
 
-    if solved:
-        return heap, visited, transforms
 
-    return heap, visited, None
+
+    return heap, visited
+
+def check_if_solved(abstract_arc_task: AbstractARCTask, heap_item: HeapItem):
+    transformed_matrices = heap_item.transformed_matrices
+    training_pairs = abstract_arc_task.train
+    for i, abstract_matrix_pair in enumerate(training_pairs):
+        transformed_matrix = transformed_matrices[i]
+        output_matrix = abstract_matrix_pair.output
+
+        if transformed_matrix != output_matrix:
+            return False
+    return True
 
 def mdl_search(abstract_arc_task: AbstractARCTask, transformations: list[Transformation], eval_features: list[Feature]):
     heap, primitive_transformations = initialize_mdl_search(abstract_arc_task, transformations, eval_features)
     visited = set()
 
-
-
-    solution = None
+    max_step_nr = 100
     step = 0
-    while heap and step < 10:
-        #item = heapq.heappop(heap)
-        #print(f"score: {item.mdl}, transforms: {item.transforms}")
+
+    while heap and step < max_step_nr:
         # debug
-        print_heap = copy.deepcopy(heap)
-        while print_heap:
-            item = heapq.heappop(print_heap)
-            print(f"heap in step {step}: score: {item.mdl}, transforms: {item.transforms}")
-        if solution is None:
-            heap, visited, solution = mdl_search_step(abstract_arc_task, heap, primitive_transformations, visited, eval_features)
-            if len(heap) > beam_width: #limit heap to beam_width
-                optima = heapq.nsmallest(beam_width, heap)
-                heapq.heapify(optima)
-                heap = optima
-        else:
-            return solution, visited
+        #print_heap = copy.deepcopy(heap)
+        #while print_heap:
+        #    item = heapq.heappop(print_heap)
+        #    print(f"heap in step {step}: score: {item.mdl}, transforms: {item.transforms}")
+
+        # check if the currently best heap item is a solution
+        heap_item: HeapItem = heap[0]
+        if check_if_solved(abstract_arc_task, heap_item):
+            return heap_item.transforms, visited, step
+
+        #update the heap with one step
+        heap, visited = mdl_search_step(abstract_arc_task, heap, primitive_transformations, visited, eval_features)
         step += 1
+        if len(heap) > beam_width: #limit heap to beam_width
+            optima = heapq.nsmallest(beam_width, heap)
+            heapq.heapify(optima)
+            heap = optima
+
+
 
 
 

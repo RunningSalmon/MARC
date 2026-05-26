@@ -34,9 +34,6 @@ class Translate(Transformation):
             else:
                 parameter_direction = self.fixed_parameter
 
-        if parameter_direction not in self.parameters:
-            raise ValueError(f"{parameter_direction} is not a valid direction for translate")
-
         for abstract_object in abstract_matrix.abstract_objects:
             translate(abstract_object, parameter_direction.direction)
 

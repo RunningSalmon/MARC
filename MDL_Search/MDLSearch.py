@@ -47,7 +47,7 @@ def initialize_mdl_search(abstract_arc_task: AbstractARCTask, transformations: l
                 #print(transformation, param, score)
                 transform_param_score += score #add to the accumulated transform(param) score
 
-            mean_transform_param_score = transform_param_score / len(params)
+            mean_transform_param_score = transform_param_score / len(training_pairs)
             mdl = nll * mean_transform_param_score
             print(transformation, param, mean_transform_param_score, nll, mdl)
             heapq.heappush(heap, HeapItem(mdl, nll, [transformation.from_parameter(param)], transformed_matrices))

@@ -46,6 +46,11 @@ class AbstractObjectMatrixPair:
         return (f"AbstractObjectMatrixPair with Input:\n{self.input},\n "
                 f"and Output:\n {self.output}\n")
 
+    def to_matrix_pair(self) -> tuple[np.ndarray, np.ndarray]:
+        input_matrix = self.input.to_matrix()
+        output_matrix = self.output.to_matrix()
+        return input_matrix, output_matrix
+
     def print_pairing(self):
         if self.pairing:
             input_objects = self.input.abstract_objects

@@ -13,11 +13,14 @@ class Feature(ABC):
         output_matrix = abstract_matrix_pair.output
         input_objects = input_matrix.abstract_objects
         output_objects = output_matrix.abstract_objects
+        mean_score = 0
 
         if not abstract_matrix_pair.pairing:
             raise(NotImplementedError("evaluate_abstract_matrix_pair needs an object pairing"))
 
-        for (input_id, output_id) in abstract_matrix_pair.pairing.items():
-            score += (self.evaluate_objects(input_objects[input_id], output_objects[output_id], (input_matrix.height, input_matrix.width)))
+        for (input_id, output_id_list) in abstract_matrix_pair.pairing.items():
+            for output_id in output_id_list:
+                score += (self.evaluate_objects(input_objects[input_id], output_objects[output_id], (input_matrix.height, input_matrix.width)))
+            mean_score = score / len(output_id_list)
 
-        return score/len(input_objects)
+        return mean_score/len(input_objects)

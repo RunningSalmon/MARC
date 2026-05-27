@@ -9,6 +9,15 @@ from Evaluation.Feature_Color import *
 from Evaluation.Feature_Position import *
 from Evaluation.Feature_Shape import *
 
+class FeatureHeapItem:
+    def __init__(self, score: float, feature: Feature, feature_mapping: dict):
+        self.score = score
+        self.feature = feature
+        self.feature_mapping = feature_mapping
+
+    def __lt__(self, other):
+        return self.score < other.score
+
 def check_paring_ambiguity(pairing: dict):
     """returns true if every object from the output matrix appears only once in the pairing"""
     paired_objects_indices = []
@@ -24,6 +33,7 @@ def create_object_mapping(abstract_matrix_pair: AbstractObjectMatrixPair, eval_f
     input_objects = input_matrix.abstract_objects
     output_objects = output_matrix.abstract_objects
     matrix_shape = input_matrix.height, input_matrix.width
+    feature_heap = []
 
     #debug
     #print(f"input objects: {len(input_objects)}, output objects: {len(output_objects)}")
@@ -42,19 +52,49 @@ def create_object_mapping(abstract_matrix_pair: AbstractObjectMatrixPair, eval_f
                     if score > highest_score:
                         highest_score = score
                         best_fit_idx2 = idx2
-                feature_pairing[idx1] = best_fit_idx2
+                feature_pairing[idx1] = [best_fit_idx2]
+
             if check_paring_ambiguity(feature_pairing):
                 mapped_matrix_pair = copy.deepcopy(abstract_matrix_pair)
                 mapped_matrix_pair.pairing = feature_pairing
                 overall_score = evaluate_abstract_matrix_pair(mapped_matrix_pair, eval_features)
-                heapq.heappush(feature_heap, (overall_score, counter, feature, feature_pairing))
+                heapq.heappush(feature_heap, FeatureHeapItem(overall_score, feature, feature_pairing))
                 counter += 1
 
-        if feature_heap:
-            feature_heap_item = heapq.heappop(feature_heap)
-            feature_score = feature_heap_item[0]
-            feature = feature_heap_item[2]
-            pairing = feature_heap_item[3]
-            return pairing
+    # 1 to x mapping
+    #elif len(input_objects) > len(output_objects):
+    #    feature_heap = []
+    #    counter = 0
+    #    for feature in eval_features:
+    #        feature_pairing = {}
+    #        for idx2 in range(len(output_objects)):
+    #            highest_score = 0
+    #            best_fit_idx1 = 0
+    #            for idx1 in range(len(input_objects)):
+    #                score = evaluate_abstract_object_pair(input_objects[idx1],
+    #                                                      output_objects[idx2],
+    #                                                      [feature],
+    #                                                      matrix_shape)
+    #                if score > highest_score:
+    #                    highest_score = score
+    #                    best_fit_idx1 = idx1
+    #            feature_pairing[best_fit_idx1].append(idx2)
+    #
+    #        if check_paring_ambiguity(feature_pairing):
+    #            mapped_matrix_pair = copy.deepcopy(abstract_matrix_pair)
+    #            mapped_matrix_pair.pairing = feature_pairing
+    #            overall_score = evaluate_abstract_matrix_pair(mapped_matrix_pair, eval_features)
+    #            heapq.heappush(feature_heap,  FeatureHeapItem(overall_score, feature, feature_pairing))
+    #            counter += 1
+    #
+    if feature_heap:
+        feature_heap_item: FeatureHeapItem = heapq.heappop(feature_heap)
+        feature_score = feature_heap_item.score
+        feature = feature_heap_item.feature
+        mapping = feature_heap_item.feature_mapping
+        return mapping
 
     return {}
+
+
+

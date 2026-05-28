@@ -1,5 +1,5 @@
 from Datatypes.Primitive_Datatypes import ArcColor
-from Summary_Statistic import *
+from .Summary_Statistic import *
 import numpy as np
 
 

@@ -3,6 +3,7 @@ import heapq
 
 from Datatypes.Abstract_ARC_Task import AbstractObjectMatrixPair
 from Evaluation.Object_Mapping import create_object_mapping
+from Evaluation.Summary_Statistic import SummaryStatistic
 from Transformations.Transformation import *
 from Evaluation.Matrix_Pair_Evaluation import *
 from Datatypes.ARC_Task import *
@@ -20,7 +21,7 @@ class HeapItem:
     def __lt__(self, other):
         return self.mdl < other.mdl
 
-def initialize_mdl_search(abstract_arc_task: AbstractARCTask, transformations: list[Transformation], eval_features: list[Feature]):
+def initialize_mdl_search(abstract_arc_task: AbstractARCTask, transformations: list[Transformation], eval_features: list[Feature], statistics: list[SummaryStatistic]):
     training_pairs = abstract_arc_task.train
     heap = []
     primitive_transformations = []
@@ -34,17 +35,24 @@ def initialize_mdl_search(abstract_arc_task: AbstractARCTask, transformations: l
             for abstract_matrix_pair in training_pairs: #iterate over trials
                 input_matrix = abstract_matrix_pair.input
                 output_matrix = abstract_matrix_pair.output
-                if not abstract_matrix_pair.pairing: #establish pairing if not yet existing
-                    abstract_matrix_pair.pairing = create_object_mapping(abstract_matrix_pair, eval_features, transformations)
-                object_pairing = abstract_matrix_pair.pairing
 
-                anticipatory_input_matrix = copy.deepcopy(input_matrix) #create manipulatable copy of the input matrix
-                transformation.transform(anticipatory_input_matrix, param) #apply current transformation with current parameter
+                #manipulation
+                anticipatory_input_matrix = copy.deepcopy(input_matrix)  # create manipulatable copy of the input matrix
+                transformation.transform(anticipatory_input_matrix, param)  # apply current transformation with current parameter
                 transformed_matrices.append(anticipatory_input_matrix)
-                anticipatory_pair = AbstractObjectMatrixPair(anticipatory_input_matrix, output_matrix, object_pairing)
-                score = evaluate_abstract_matrix_pair(anticipatory_pair, eval_features) #compare to output matrix
-                #print(transformation, param, score)
-                transform_param_score += score #add to the accumulated transform(param) score
+                anticipatory_pair = AbstractObjectMatrixPair(anticipatory_input_matrix, output_matrix, abstract_matrix_pair.pairing)
+
+                #object evaluation
+                if not anticipatory_pair.pairing: #establish pairing if not yet existing
+                    anticipatory_pair.pairing = create_object_mapping(anticipatory_pair, eval_features)
+                if anticipatory_pair.pairing:
+                    score = obj_eval_abstract_matrix_pair(anticipatory_pair, eval_features) #compare to output matrix
+                    #print(transformation, param, score)
+                    transform_param_score += score #add to the accumulated transform(param) score
+
+                #summary statistics evaluation
+                else:
+                    transform_param_score = sumstat_eval_abstract_matrix_pair(anticipatory_pair, statistics)
 
             mean_transform_param_score = transform_param_score / len(training_pairs)
             mdl = nll * (1-mean_transform_param_score)
@@ -54,7 +62,7 @@ def initialize_mdl_search(abstract_arc_task: AbstractARCTask, transformations: l
 
     return heap, primitive_transformations
 
-def mdl_search_step(abstract_matrix_pair: AbstractARCTask, heap: list, primitive_transformations: list, visited: set, eval_features: list[Feature]) -> tuple[list, set]:
+def mdl_search_step(abstract_matrix_pair: AbstractARCTask, heap: list, primitive_transformations: list, visited: set, eval_features: list[Feature], statistics: list[SummaryStatistic]) -> tuple[list, set]:
     training_pairs = abstract_matrix_pair.train
     item: HeapItem = heapq.heappop(heap)
     transforms = item.transforms
@@ -82,10 +90,22 @@ def mdl_search_step(abstract_matrix_pair: AbstractARCTask, heap: list, primitive
             if transformed_matrix != output_matrix:
                 solved = False
 
+            #manipulate matrix
             anticipatory_matrix = copy.deepcopy(transformed_matrix)
             transformation.transform(anticipatory_matrix)
             anticipatory_pair = AbstractObjectMatrixPair(anticipatory_matrix, output_matrix, object_pairing)
-            transform_score += evaluate_abstract_matrix_pair(anticipatory_pair, eval_features)
+
+            # object evaluation
+            if not anticipatory_pair.pairing:  # establish pairing if not yet existing
+                anticipatory_pair.pairing = create_object_mapping(anticipatory_pair, eval_features)
+            if anticipatory_pair.pairing:
+                score = obj_eval_abstract_matrix_pair(anticipatory_pair, eval_features)  # compare to output matrix
+                transform_score += score  # add to the accumulated transform(param) score
+
+            # summary statistics evaluation
+            else:
+                transform_score = sumstat_eval_abstract_matrix_pair(anticipatory_pair, statistics)
+
             anticipatory_matrices.append(anticipatory_matrix)
 
         mean_transform_score = transform_score / len(training_pairs)
@@ -111,8 +131,8 @@ def check_if_solved(abstract_arc_task: AbstractARCTask, heap_item: HeapItem):
             return False
     return True
 
-def mdl_search(abstract_arc_task: AbstractARCTask, transformations: list[Transformation], eval_features: list[Feature]):
-    heap, primitive_transformations = initialize_mdl_search(abstract_arc_task, transformations, eval_features)
+def mdl_search(abstract_arc_task: AbstractARCTask, transformations: list[Transformation], eval_features: list[Feature], statistics: list[SummaryStatistic]):
+    heap, primitive_transformations = initialize_mdl_search(abstract_arc_task, transformations, eval_features, statistics)
     visited = set()
 
     max_step_nr = 100
@@ -131,7 +151,7 @@ def mdl_search(abstract_arc_task: AbstractARCTask, transformations: list[Transfo
             return heap_item.transforms, visited, step
 
         #update the heap with one step
-        heap, visited = mdl_search_step(abstract_arc_task, heap, primitive_transformations, visited, eval_features)
+        heap, visited = mdl_search_step(abstract_arc_task, heap, primitive_transformations, visited, eval_features, statistics)
         step += 1
         if len(heap) > beam_width: #limit heap to beam_width
             optima = heapq.nsmallest(beam_width, heap)

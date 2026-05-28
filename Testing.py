@@ -2,6 +2,13 @@ from Evaluation.Matrix_Pair_Evaluation import *
 from Evaluation.Feature_Color import *
 from Evaluation.Feature_Position import *
 from Evaluation.Feature_Shape import *
+
+from Evaluation.Statistic_Number_Of_Edges import *
+from Evaluation.Statistic_Number_Of_Edges import *
+from Evaluation.Statistic_Number_Of_Objects import NumberOfObjects
+from Evaluation.Statistic_Pixels_Correct import *
+from Evaluation.Statistic_Pixels_Per_Color import *
+
 from Task_Generation.Matrix_Transformation import manipulate_arc_task, abstract_task_to_arc_task, \
     abstract_pair_to_matrix_pair, manipulate_abstract_matrix
 
@@ -93,17 +100,21 @@ if __name__ == '__main__':
     template_task_1 = load_arc_task_from_json("Template_Task_1.json", "ARC_Generator_JSONs")
     #print(template_task_1)
     template_task_1 = template_task_1.to_abstract_task()
-    manipulations = [Transformations.rot90.value, Transformations.dup_up.value,]
+    manipulations = [Transformations.rot90.value, Transformations.dup_up.value, Transformations.rec_1.value, Transformations.tra_left.value,]
     eval_features = [FeatureColor(),
                     FeaturePosition(),
                     FeatureShape()]
+    statistics = [NumberOfEdges(),
+                  NumberOfObjects(),
+                  PixelsCorrect(),
+                  PixelsPerColor(),]
     transforms = [Duplicate(),
                   Mirror(),
                   Recolor(),
                   Rotate(),
                   Translate(),]
     manipulate_arc_task(template_task_1, manipulations)
-    print(abstract_task_to_arc_task(template_task_1))
+    #print(abstract_task_to_arc_task(template_task_1))
 
     #test_matrix_pair = template_task_1.train[0]
     #test_matrix_pair.pairing = create_object_mapping(test_matrix_pair, eval_features, transformations)
@@ -117,8 +128,8 @@ if __name__ == '__main__':
 
 
 
-    #solution, visited, steps = mdl_search(template_task_1, transforms, eval_features)
-    #print(f"found solution:\n {solution}\n in {steps} steps. \nvisited:\n{visited}")
+    solution, visited, steps = mdl_search(template_task_1, transforms, eval_features, statistics)
+    print(f"found solution:\n {solution}\n in {steps} steps. \nvisited:\n{visited}")
 
 
     #print(first_input)

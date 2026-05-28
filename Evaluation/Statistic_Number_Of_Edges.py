@@ -21,13 +21,13 @@ def get_number_of_edges(matrix: np.ndarray) -> int:
             if i > 0:
                 if matrix[i-1][j] != value:
                     count_of_edges += 1
-            if i < matrix_height:
+            if i < matrix_height-1:
                 if matrix[i+1][j] != value:
                     count_of_edges += 1
             if j > 0:
                 if matrix[i][j-1] != value:
                     count_of_edges += 1
-            if j < matrix_width:
+            if j < matrix_width-1:
                 if matrix[i][j+1] != value:
                     count_of_edges += 1
     return count_of_edges

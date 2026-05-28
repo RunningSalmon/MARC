@@ -100,7 +100,7 @@ if __name__ == '__main__':
     template_task_1 = load_arc_task_from_json("Template_Task_1.json", "ARC_Generator_JSONs")
     #print(template_task_1)
     template_task_1 = template_task_1.to_abstract_task()
-    manipulations = [Transformations.rot90.value, Transformations.dup_up.value, Transformations.rec_1.value, Transformations.tra_left.value,]
+    manipulations = [Transformations.tra_left.value, Transformations.tra_left.value, Transformations.tra_left.value, Transformations.tra_left.value]
     eval_features = [FeatureColor(),
                     FeaturePosition(),
                     FeatureShape()]

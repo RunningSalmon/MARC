@@ -9,6 +9,8 @@ class NumberOfEdges(SummaryStatistic):
         output_matrix = abstract_matrix_pair.output.to_matrix()
         input_edges = get_number_of_edges(input_matrix)
         output_edges = get_number_of_edges(output_matrix)
+        if max(input_edges, output_edges) == 0:
+            return 1
         return min(input_edges, output_edges)/max(input_edges, output_edges)
 
 

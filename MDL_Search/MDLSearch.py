@@ -45,18 +45,20 @@ def initialize_mdl_search(abstract_arc_task: AbstractARCTask, transformations: l
                 #object evaluation
                 if not anticipatory_pair.pairing: #establish pairing if not yet existing
                     anticipatory_pair.pairing = create_object_mapping(anticipatory_pair, eval_features)
-                if anticipatory_pair.pairing:
+                if anticipatory_pair.pairing and eval_features:
                     score = obj_eval_abstract_matrix_pair(anticipatory_pair, eval_features) #compare to output matrix
                     #print(transformation, param, score)
                     transform_param_score += score #add to the accumulated transform(param) score
 
                 #summary statistics evaluation
-                else:
+                elif statistics:
                     transform_param_score = sumstat_eval_abstract_matrix_pair(anticipatory_pair, statistics)
+                else:
+                    raise ValueError("no Summary Statistics given to the search. Failed because there were either no Features given or there was no unambiguous object mapping.")
 
             mean_transform_param_score = transform_param_score / len(training_pairs)
             mdl = nll * (1-mean_transform_param_score)
-            print(transformation, param, mean_transform_param_score, nll, mdl)
+            #print(transformation, param, mean_transform_param_score, nll, mdl)
             heapq.heappush(heap, HeapItem(mdl, nll, [transformation.from_parameter(param)], transformed_matrices))
             primitive_transformations.append(transformation.from_parameter(param))
 
@@ -98,13 +100,15 @@ def mdl_search_step(abstract_matrix_pair: AbstractARCTask, heap: list, primitive
             # object evaluation
             if not anticipatory_pair.pairing:  # establish pairing if not yet existing
                 anticipatory_pair.pairing = create_object_mapping(anticipatory_pair, eval_features)
-            if anticipatory_pair.pairing:
+            if anticipatory_pair.pairing and eval_features:
                 score = obj_eval_abstract_matrix_pair(anticipatory_pair, eval_features)  # compare to output matrix
                 transform_score += score  # add to the accumulated transform(param) score
 
             # summary statistics evaluation
-            else:
+            elif statistics:
                 transform_score = sumstat_eval_abstract_matrix_pair(anticipatory_pair, statistics)
+            else:
+                raise ValueError("no Summary Statistics given to the search. Failed because there were either no Features given or there was no unambiguous object mapping.")
 
             anticipatory_matrices.append(anticipatory_matrix)
 
@@ -163,4 +167,4 @@ def mdl_search(abstract_arc_task: AbstractARCTask, transformations: list[Transfo
 
 
 
-    return None, visited
+    return None, visited, step

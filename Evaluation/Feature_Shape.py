@@ -19,6 +19,15 @@ def eval_shape_matrix(matrix_1: np.ndarray, matrix_2: np.ndarray):
     max_height = max(matrix_1_shape[0], matrix_2_shape[0])
     max_width = max(matrix_1_shape[1], matrix_2_shape[1])
 
+    #both objects have no shape matrices
+    if max_height == 0 or max_width == 0:
+        return 1
+
+    #one object has no shape matrix
+    if min_height == 0 or min_width == 0:
+        return 0
+
+
     similarity_count = 0
     for i in range(min_height):
         for j in range(min_width):

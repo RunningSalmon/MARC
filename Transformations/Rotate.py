@@ -2,10 +2,11 @@ from typing import Optional
 
 from Datatypes.Abstract_ARC_Task import AbstractObjectMatrix
 from Datatypes.Primitive_Datatypes import Degree
-from Transformations.Transformation import Transformation, FeatureParameter
+from Transformations.Transformation import Transformation, TransformationParameter
 from Transformations.Primitive_Transformations import rotate
+from Conditionals.Condition import *
 
-class RotationParameter(FeatureParameter):
+class RotationParameter(TransformationParameter):
 
     def __init__(self, degree: Degree):
         self.degree = degree
@@ -15,13 +16,13 @@ class RotationParameter(FeatureParameter):
         return [cls(c) for c in Degree]
 
     def __repr__(self):
-        return f"RotationParameter({self.degree.name})"
+        return self.degree.name
 
 class Rotate(Transformation):
     parameters = RotationParameter.possible_values()
 
-    def __init__(self, parameter_degree: RotationParameter = None):
-        super().__init__(parameter_degree)
+    def __init__(self, parameter_degree: RotationParameter = None, condition: Optional[Condition] = None):
+        super().__init__(parameter_degree, condition)
 
     def from_parameter(self, parameter: Optional[RotationParameter] = None) -> 'Rotate':
         return Rotate(parameter)
@@ -34,5 +35,6 @@ class Rotate(Transformation):
                 parameter_degree = self.fixed_parameter
 
         for abstract_object in abstract_matrix.abstract_objects:
-            rotate(abstract_object, parameter_degree.degree)
+            if self.condition is None or self.condition.applies_to(abstract_object):
+                rotate(abstract_object, parameter_degree.degree)
 

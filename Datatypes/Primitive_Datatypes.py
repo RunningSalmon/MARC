@@ -42,3 +42,7 @@ class Degree(Enum):
     Deg90 = -1
     Deg180 = -2
     Deg270 = -3
+
+class SmallerOrLarger(Enum):
+    smaller = 0
+    larger = 1

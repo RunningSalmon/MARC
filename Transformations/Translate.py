@@ -2,10 +2,11 @@ from typing import Optional
 
 from Datatypes.Abstract_ARC_Task import AbstractObjectMatrix
 from Datatypes.Primitive_Datatypes import Direction
-from Transformations.Transformation import Transformation, FeatureParameter
+from Transformations.Transformation import Transformation, TransformationParameter
 from Transformations.Primitive_Transformations import translate
+from Conditionals.Condition import *
 
-class TranslateParameter(FeatureParameter):
+class TranslateParameter(TransformationParameter):
 
     def __init__(self, direction: Direction):
         self.direction = direction
@@ -15,14 +16,14 @@ class TranslateParameter(FeatureParameter):
         return [cls(c) for c in Direction]
 
     def __repr__(self):
-        return f"TranslateParameter({self.direction.name})"
+        return self.direction.name
 
 
 class Translate(Transformation):
     parameters = TranslateParameter.possible_values()
 
-    def __init__(self, parameter_direction: TranslateParameter = None):
-        super().__init__(parameter_direction)
+    def __init__(self, parameter_direction: TranslateParameter = None, condition: Optional[Condition] = None):
+        super().__init__(parameter_direction, condition)
 
     def from_parameter(self, parameter: Optional[TranslateParameter] = None) -> 'Translate':
         return Translate(parameter)
@@ -35,5 +36,6 @@ class Translate(Transformation):
                 parameter_direction = self.fixed_parameter
 
         for abstract_object in abstract_matrix.abstract_objects:
-            translate(abstract_object, parameter_direction.direction)
+            if self.condition is None or self.condition.applies_to(abstract_object):
+                translate(abstract_object, parameter_direction.direction)
 

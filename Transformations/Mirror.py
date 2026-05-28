@@ -2,10 +2,11 @@ from typing import Optional
 
 from Datatypes.Abstract_ARC_Task import AbstractObjectMatrix
 from Datatypes.Primitive_Datatypes import Axis
-from Transformations.Transformation import Transformation, FeatureParameter
+from Transformations.Transformation import Transformation, TransformationParameter
 from Transformations.Primitive_Transformations import mirror
+from Conditionals.Condition import *
 
-class MirrorParameter(FeatureParameter):
+class MirrorParameter(TransformationParameter):
 
     def __init__(self, axis: Axis):
         self.axis = axis
@@ -15,13 +16,13 @@ class MirrorParameter(FeatureParameter):
         return [cls(c) for c in Axis]
 
     def __repr__(self):
-        return f"MirrorParameter({self.axis.name})"
+        return self.axis.name + " axis"
 
 class Mirror(Transformation):
     parameters = MirrorParameter.possible_values()
 
-    def __init__(self, parameter_axis: MirrorParameter = None):
-        super().__init__(parameter_axis)
+    def __init__(self, parameter_axis: MirrorParameter = None, condition: Optional[Condition] = None):
+        super().__init__(parameter_axis, condition)
 
     def from_parameter(self, parameter: Optional[MirrorParameter] = None) -> 'Mirror':
         return Mirror(parameter)
@@ -34,5 +35,6 @@ class Mirror(Transformation):
                 parameter_axis = self.fixed_parameter
 
         for abstract_object in abstract_matrix.abstract_objects:
-            mirror(abstract_object, parameter_axis.axis)
+            if self.condition is None or self.condition.applies_to(abstract_object):
+                mirror(abstract_object, parameter_axis.axis)
 

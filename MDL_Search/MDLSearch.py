@@ -132,7 +132,7 @@ def mdl_search_step(abstract_matrix_pair: AbstractARCTask,
                 score, transformed_matrix = transform_param_results
 
             transform_scores.append(score)
-            transformed_matrices.append(transformed_matrix)
+            anticipatory_matrices.append(transformed_matrix)
 
         mean_transform_score = np.mean(transform_scores)
         nll = transformation.get_nll(len(primitive_transformations))
@@ -140,28 +140,33 @@ def mdl_search_step(abstract_matrix_pair: AbstractARCTask,
         new_transformation_series_mdl = (1-mean_transform_score) * new_transformation_series_nll
 
         accumulated_transforms = transforms + [transformation]
-        heapq.heappush(heap, HeapItem(new_transformation_series_mdl, nll, accumulated_transforms, anticipatory_matrices))
+        heapq.heappush(heap, HeapItem(new_transformation_series_mdl, new_transformation_series_nll, accumulated_transforms, anticipatory_matrices))
 
         if possible_conditions:
             for condition in possible_conditions:
-                transformation.condition = condition
-                transformation = copy.deepcopy(transformation)
+                conditioned_transformation = copy.deepcopy(transformation)
+                conditioned_transformation.condition = condition
                 scores = []
-                transformed_matrices = []
-                for abstract_matrix_pair in training_pairs:  # iterate over trials
-                    transform_param_results = transform_eval_matrix_pair(abstract_matrix_pair,
-                                                                         transformation,
+                anticipatory_matrices = []
+                for i, abstract_matrix_pair in enumerate(training_pairs):
+                    transformed_matrix = transformed_matrices[i]
+                    output_matrix = abstract_matrix_pair.output
+                    transformed_pair = AbstractMatrixPair(transformed_matrix, output_matrix)
+
+                    transform_param_results = transform_eval_matrix_pair(transformed_pair,
+                                                                         conditioned_transformation,
                                                                          eval_features,
                                                                          statistics)
                     score, transformed_matrix = transform_param_results
                     scores.append(score)
-                    transformed_matrices.append(transformed_matrix)
+                    anticipatory_matrices.append(transformed_matrix)
                 mean_score = float(np.mean(scores))
                 if mean_score > mean_transform_score:
-                    mdl = nll * (1 - mean_score)
-                    transformation.condition = condition
-                    accumulated_transforms = transforms + [transformation]
-                    heapq.heappush(heap, HeapItem(mdl, nll, accumulated_transforms, transformed_matrices))
+                    nll = conditioned_transformation.get_nll(len(primitive_transformations))
+                    new_transformation_series_nll = transformation_series_nll + nll
+                    new_transformation_series_mdl = (1 - mean_score) * new_transformation_series_nll
+                    accumulated_transforms = transforms + [conditioned_transformation]
+                    heapq.heappush(heap, HeapItem(new_transformation_series_mdl, new_transformation_series_nll, accumulated_transforms, anticipatory_matrices))
 
     return heap, visited
 

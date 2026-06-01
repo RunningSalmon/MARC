@@ -106,7 +106,7 @@ if __name__ == '__main__':
     template_task_1 = template_task_1.to_abstract_task()
     rot_90_conditioned = copy.deepcopy(Transformations.rot90.value)
     rot_90_conditioned.condition = ConditionColor(ConditionColorParameter(ArcColor(4)))
-    manipulations = [rot_90_conditioned]
+    manipulations = [Transformations.tra_up.value, rot_90_conditioned, Transformations.rec_7.value]
     eval_features = [FeatureColor(),
                     FeaturePosition(),
                     FeatureShape()]

@@ -67,8 +67,10 @@ def initialize_mdl_search(abstract_arc_task: AbstractARCTask,
 
             if possible_conditions:
                 for condition in possible_conditions:
+                    transformation = copy.deepcopy(transformation)
                     transformation.condition = condition
                     scores = []
+                    transformed_matrices = []
                     for abstract_matrix_pair in training_pairs:  # iterate over trials
                         transform_param_results = transform_eval_matrix_pair(abstract_matrix_pair,
                                                                            transformation,
@@ -76,6 +78,7 @@ def initialize_mdl_search(abstract_arc_task: AbstractARCTask,
                                                                            statistics,)
                         score, transformed_matrix = transform_param_results
                         scores.append(score)
+                        transformed_matrices.append(transformed_matrix)
                     mean_score = float(np.mean(scores))
                     if mean_score > mean_transform_param_score:
                         mdl = nll * (1-mean_score)
@@ -90,11 +93,12 @@ def mdl_search_step(abstract_matrix_pair: AbstractARCTask,
                     primitive_transformations: list,
                     visited: set,
                     eval_features: list[Feature],
-                    statistics: list[SummaryStatistic]) -> tuple[list, set]:
+                    statistics: list[SummaryStatistic],
+                    conditions: list[Condition]) -> tuple[list, set]:
     training_pairs = abstract_matrix_pair.train
     item: HeapItem = heapq.heappop(heap)
     transforms = item.transforms
-
+    possible_conditions = set()
     # check if sequence already visited else append to visited
     key = tuple(repr(transform) for transform in transforms)
     if key in visited:
@@ -102,43 +106,35 @@ def mdl_search_step(abstract_matrix_pair: AbstractARCTask,
     visited.add(key)
 
     transformed_matrices = item.transformed_matrices
-    transformation_series_mdl = item.mdl
     transformation_series_nll = item.nll
-    solved = True
-
 
     for transformation in primitive_transformations:
         anticipatory_matrices = []
-        transform_score = 0
+        transform_scores = []
         for i, abstract_matrix_pair in enumerate(training_pairs):
             transformed_matrix = transformed_matrices[i]
             output_matrix = abstract_matrix_pair.output
-            object_pairing = abstract_matrix_pair.mapping
+            transformed_pair = AbstractMatrixPair(transformed_matrix, output_matrix)
 
-            if transformed_matrix != output_matrix:
-                solved = False
-
-            #manipulate matrix
-            anticipatory_matrix = copy.deepcopy(transformed_matrix)
-            transformation.transform_abstract_matrix(anticipatory_matrix)
-            anticipatory_pair = AbstractMatrixPair(anticipatory_matrix, output_matrix, object_pairing)
-
-            # object evaluation
-            if not anticipatory_pair.mapping:  # establish pairing if not yet existing
-                anticipatory_pair.mapping = create_object_mapping(anticipatory_pair, eval_features)
-            if anticipatory_pair.mapping and eval_features:
-                score = obj_eval_abstract_matrix_pair(anticipatory_pair, eval_features)  # compare to output matrix
-                transform_score += score  # add to the accumulated transform(param) score
-
-            # summary statistics evaluation
-            elif statistics:
-                transform_score = sumstat_eval_abstract_matrix_pair(anticipatory_pair, statistics)
+            if conditions:
+                transform_param_results = transform_eval_matrix_pair_conditioned(transformed_pair,
+                                                                                 transformation,
+                                                                                 eval_features,
+                                                                                 statistics,
+                                                                                 conditions)
+                transform_param_possible_conditions, score, transformed_matrix = transform_param_results
+                possible_conditions.update(transform_param_possible_conditions)
             else:
-                raise ValueError("no Summary Statistics given to the search. Failed because there were either no Features given or there was no unambiguous object mapping.")
+                transform_param_results = transform_eval_matrix_pair(transformed_pair,
+                                                                     transformation,
+                                                                     eval_features,
+                                                                     statistics)
+                score, transformed_matrix = transform_param_results
 
-            anticipatory_matrices.append(anticipatory_matrix)
+            transform_scores.append(score)
+            transformed_matrices.append(transformed_matrix)
 
-        mean_transform_score = transform_score / len(training_pairs)
+        mean_transform_score = np.mean(transform_scores)
         nll = transformation.get_nll(len(primitive_transformations))
         new_transformation_series_nll = transformation_series_nll + nll
         new_transformation_series_mdl = (1-mean_transform_score) * new_transformation_series_nll
@@ -146,7 +142,26 @@ def mdl_search_step(abstract_matrix_pair: AbstractARCTask,
         accumulated_transforms = transforms + [transformation]
         heapq.heappush(heap, HeapItem(new_transformation_series_mdl, nll, accumulated_transforms, anticipatory_matrices))
 
-
+        if possible_conditions:
+            for condition in possible_conditions:
+                transformation.condition = condition
+                transformation = copy.deepcopy(transformation)
+                scores = []
+                transformed_matrices = []
+                for abstract_matrix_pair in training_pairs:  # iterate over trials
+                    transform_param_results = transform_eval_matrix_pair(abstract_matrix_pair,
+                                                                         transformation,
+                                                                         eval_features,
+                                                                         statistics)
+                    score, transformed_matrix = transform_param_results
+                    scores.append(score)
+                    transformed_matrices.append(transformed_matrix)
+                mean_score = float(np.mean(scores))
+                if mean_score > mean_transform_score:
+                    mdl = nll * (1 - mean_score)
+                    transformation.condition = condition
+                    accumulated_transforms = transforms + [transformation]
+                    heapq.heappush(heap, HeapItem(mdl, nll, accumulated_transforms, transformed_matrices))
 
     return heap, visited
 
@@ -169,7 +184,7 @@ def mdl_search(abstract_arc_task: AbstractARCTask,
     heap, primitive_transformations = initialize_mdl_search(abstract_arc_task, transformations, eval_features, statistics, conditions)
     visited = set()
 
-    max_step_nr = 0
+    max_step_nr = 20
     step = 0
 
     #debug
@@ -191,7 +206,7 @@ def mdl_search(abstract_arc_task: AbstractARCTask,
             return heap_item.transforms, visited, step
 
         #update the heap with one step
-        heap, visited = mdl_search_step(abstract_arc_task, heap, primitive_transformations, visited, eval_features, statistics)
+        heap, visited = mdl_search_step(abstract_arc_task, heap, primitive_transformations, visited, eval_features, statistics, conditions)
         step += 1
         if len(heap) > beam_width: #limit heap to beam_width
             optima = heapq.nsmallest(beam_width, heap)

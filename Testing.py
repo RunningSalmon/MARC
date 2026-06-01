@@ -122,7 +122,6 @@ if __name__ == '__main__':
     conditions = [ConditionColor(),
                   ConditionPosition(),
                   ConditionShape(),]
-    conditions = [ConditionColor(),]
     manipulate_arc_task(template_task_1, manipulations)
     print(abstract_task_to_arc_task(template_task_1))
 

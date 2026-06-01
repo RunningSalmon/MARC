@@ -31,16 +31,16 @@ class AbstractObjectMatrix:
                         color_matrix[i+y][j+x] = obj.Color.value
         return color_matrix
 
-class AbstractObjectMatrixPair:
+class AbstractMatrixPair:
     input: AbstractObjectMatrix
     output: AbstractObjectMatrix
-    pairing = {}
+    mapping = {}
 
     def __init__(self, abstract_input: AbstractObjectMatrix, abstract_output: AbstractObjectMatrix, object_pairing = None):
         self.input = abstract_input
         self.output = abstract_output
         if object_pairing:
-            self.pairing = object_pairing
+            self.mapping = object_pairing
 
     def __str__(self):
         return (f"AbstractObjectMatrixPair with Input:\n{self.input},\n "
@@ -52,19 +52,19 @@ class AbstractObjectMatrixPair:
         return input_matrix, output_matrix
 
     def print_pairing(self):
-        if self.pairing:
+        if self.mapping:
             input_objects = self.input.abstract_objects
             output_objects = self.output.abstract_objects
 
-            for id1, id2 in self.pairing.items():
+            for id1, id2 in self.mapping.items():
                 print(f"Pairing {id1}: \n{input_objects[id1]}\n {output_objects[id2]}")
 
 
 class AbstractARCTask:
-    train: list[AbstractObjectMatrixPair]
-    test: list[AbstractObjectMatrixPair]
+    train: list[AbstractMatrixPair]
+    test: list[AbstractMatrixPair]
 
-    def __init__(self, train: list[AbstractObjectMatrixPair], test: list[AbstractObjectMatrixPair]):
+    def __init__(self, train: list[AbstractMatrixPair], test: list[AbstractMatrixPair]):
         self.train = train
         self.test = test
 

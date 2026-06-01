@@ -2,6 +2,7 @@ from typing import Optional
 
 from Datatypes.Abstract_ARC_Task import AbstractObjectMatrix
 from Datatypes.Primitive_Datatypes import ArcColor
+from Transformations.Rotate import RotationParameter
 from Transformations.Transformation import Transformation, TransformationParameter
 from Transformations.Primitive_Transformations import recolor
 from Conditionals.Condition import *
@@ -26,18 +27,28 @@ class Recolor(Transformation):
     def __init__(self, parameter_color: Optional[RecolorParameter] = None, condition: Optional[Condition] = None):
         super().__init__(parameter_color, condition)
 
-    def from_parameter(self, parameter: Optional[RecolorParameter] = None) -> 'Recolor':
-        return Recolor(parameter)
+    def from_parameter_condition(self, parameter: Optional[RotationParameter] = None, condition: Optional[Condition] = None) -> 'Recolor':
+        return Recolor(parameter, condition)
 
-    def transform(self, abstract_matrix: AbstractObjectMatrix, parameter_color: Optional[RecolorParameter] = None):
+    def transform_abstract_matrix(self, abstract_matrix: AbstractObjectMatrix, parameter_color: Optional[RecolorParameter] = None):
         if parameter_color is None:
             if self.fixed_parameter is None:
                 raise ValueError("Either color or fixed_parameter must be specified")
             else:
                 parameter_color = self.fixed_parameter
+
         for abstract_object in abstract_matrix.abstract_objects:
-            if self.condition is None or self.condition.applies_to(abstract_object):
-                recolor(abstract_object, parameter_color.color)
+            self.transform_abstract_object(abstract_object, parameter_color)
+
+    def transform_abstract_object(self, abstract_object: AbstractObject, parameter_color: Optional[RecolorParameter] = None):
+        if parameter_color is None:
+            if self.fixed_parameter is None:
+                raise ValueError("Either color or fixed_parameter must be specified")
+            else:
+                parameter_color = self.fixed_parameter
+
+        if self.condition is None or self.condition.applies_to(abstract_object):
+            recolor(abstract_object, parameter_color.color)
 
 
 

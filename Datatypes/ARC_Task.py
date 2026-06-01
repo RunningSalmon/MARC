@@ -2,7 +2,7 @@ import copy
 from dataclasses import dataclass
 import numpy as np
 
-from Datatypes.Abstract_ARC_Task import AbstractObjectMatrix, AbstractObjectMatrixPair, AbstractARCTask
+from Datatypes.Abstract_ARC_Task import AbstractObjectMatrix, AbstractMatrixPair, AbstractARCTask
 import json
 
 from Datatypes.Abstract_Object import AbstractObject
@@ -99,7 +99,7 @@ class MatrixPair:
     def to_abstract_matrix_pair(self):
         abstract_input = self.input.to_abstract_matrix()
         abstract_output = self.output.to_abstract_matrix()
-        return AbstractObjectMatrixPair(abstract_input, abstract_output)
+        return AbstractMatrixPair(abstract_input, abstract_output)
 
 
 @dataclass

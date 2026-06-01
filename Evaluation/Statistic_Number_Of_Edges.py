@@ -1,10 +1,10 @@
-from Datatypes.Abstract_ARC_Task import AbstractObjectMatrixPair, AbstractObjectMatrix
+from Datatypes.Abstract_ARC_Task import AbstractMatrixPair, AbstractObjectMatrix
 from Evaluation.Summary_Statistic import SummaryStatistic
 import numpy as np
 
 
 class NumberOfEdges(SummaryStatistic):
-    def get_fitness(self, abstract_matrix_pair: AbstractObjectMatrixPair) -> float:
+    def get_fitness(self, abstract_matrix_pair: AbstractMatrixPair) -> float:
         input_matrix = abstract_matrix_pair.input.to_matrix()
         output_matrix = abstract_matrix_pair.output.to_matrix()
         input_edges = get_number_of_edges(input_matrix)

@@ -24,10 +24,10 @@ class Rotate(Transformation):
     def __init__(self, parameter_degree: RotationParameter = None, condition: Optional[Condition] = None):
         super().__init__(parameter_degree, condition)
 
-    def from_parameter(self, parameter: Optional[RotationParameter] = None) -> 'Rotate':
-        return Rotate(parameter)
+    def from_parameter_condition(self, parameter: Optional[RotationParameter] = None, condition: Optional[Condition] = None) -> 'Rotate':
+        return Rotate(parameter, condition)
 
-    def transform(self, abstract_matrix: AbstractObjectMatrix, parameter_degree: Optional[RotationParameter] = None):
+    def transform_abstract_matrix(self, abstract_matrix: AbstractObjectMatrix, parameter_degree: Optional[RotationParameter] = None):
         if parameter_degree is None:
             if self.fixed_parameter is None:
                 raise ValueError("Either degree or fixed_parameter must be specified")
@@ -36,5 +36,14 @@ class Rotate(Transformation):
 
         for abstract_object in abstract_matrix.abstract_objects:
             if self.condition is None or self.condition.applies_to(abstract_object):
-                rotate(abstract_object, parameter_degree.degree)
+                self.transform_abstract_object(abstract_object, parameter_degree)
 
+    def transform_abstract_object(self, abstract_object: AbstractObject, parameter_degree: Optional[RotationParameter] = None):
+        if parameter_degree is None:
+            if self.fixed_parameter is None:
+                raise ValueError("Either degree or fixed_parameter must be specified")
+            else:
+                parameter_degree = self.fixed_parameter
+
+        if self.condition is None or self.condition.applies_to(abstract_object):
+            rotate(abstract_object, parameter_degree.degree)

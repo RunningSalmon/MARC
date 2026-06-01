@@ -25,16 +25,25 @@ class Duplicate(Transformation):
     def __init__(self, direction: DuplicationParameter = None, condition: Optional[Condition] = None):
         super().__init__(direction, condition)
 
-    def from_parameter(self, parameter: Optional[DuplicationParameter] = None) -> 'Duplicate':
-        return Duplicate(parameter)
+    def from_parameter_condition(self, parameter: Optional[TransformationParameter] = None, condition: Optional[Condition] = None) -> 'Duplicate':
+        return Duplicate(parameter, condition)
 
-    def transform(self, abstract_matrix: AbstractObjectMatrix, direction: Optional[DuplicationParameter] = None):
-        if direction is None:
+    def transform_abstract_matrix(self, abstract_matrix: AbstractObjectMatrix, parameter_direction: Optional[DuplicationParameter] = None):
+        if parameter_direction is None:
             if self.fixed_parameter is None:
                 raise ValueError("Either direction or fixed_parameter must be specified")
             else:
-                direction = self.fixed_parameter
+                parameter_direction = self.fixed_parameter
 
         for abstract_object in abstract_matrix.abstract_objects:
-            if self.condition is None or self.condition.applies_to(abstract_object):
-                duplicate(abstract_object, direction.direction)
+                self.transform_abstract_object(abstract_object, parameter_direction)
+
+    def transform_abstract_object(self, abstract_object: AbstractObject, parameter_direction: Optional[DuplicationParameter] = None):
+        if parameter_direction is None:
+            if self.fixed_parameter is None:
+                raise ValueError("Either direction or fixed_parameter must be specified")
+            else:
+                parameter_direction = self.fixed_parameter
+
+        if self.condition is None or self.condition.applies_to(abstract_object):
+            duplicate(abstract_object, parameter_direction.direction)

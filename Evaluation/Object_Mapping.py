@@ -1,7 +1,7 @@
 import copy
 import heapq
 
-from Datatypes.Abstract_ARC_Task import AbstractObjectMatrixPair
+from Datatypes.Abstract_ARC_Task import AbstractMatrixPair
 from Transformations.Transformation import *
 from Evaluation.Matrix_Pair_Evaluation import *
 from Datatypes.Primitive_Datatypes import *
@@ -27,7 +27,7 @@ def check_paring_ambiguity(pairing: dict):
         paired_objects_indices.append(paired_idx)
     return True
 
-def create_object_mapping(abstract_matrix_pair: AbstractObjectMatrixPair, eval_features: list[Feature]):
+def create_object_mapping(abstract_matrix_pair: AbstractMatrixPair, eval_features: list[Feature]):
     input_matrix = abstract_matrix_pair.input
     output_matrix = abstract_matrix_pair.output
     input_objects = input_matrix.abstract_objects
@@ -56,7 +56,7 @@ def create_object_mapping(abstract_matrix_pair: AbstractObjectMatrixPair, eval_f
 
             if check_paring_ambiguity(feature_pairing):
                 mapped_matrix_pair = copy.deepcopy(abstract_matrix_pair)
-                mapped_matrix_pair.pairing = feature_pairing
+                mapped_matrix_pair.mapping = feature_pairing
                 overall_score = obj_eval_abstract_matrix_pair(mapped_matrix_pair, eval_features)
                 heapq.heappush(feature_heap, FeatureHeapItem(overall_score, feature, feature_pairing))
                 counter += 1

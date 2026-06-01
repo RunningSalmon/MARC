@@ -24,10 +24,11 @@ class Mirror(Transformation):
     def __init__(self, parameter_axis: MirrorParameter = None, condition: Optional[Condition] = None):
         super().__init__(parameter_axis, condition)
 
-    def from_parameter(self, parameter: Optional[MirrorParameter] = None) -> 'Mirror':
-        return Mirror(parameter)
+    def from_parameter_condition(self, parameter: Optional[MirrorParameter] = None,
+                                 condition: Optional[Condition] = None) -> 'Mirror':
+        return Mirror(parameter, condition)
 
-    def transform(self, abstract_matrix: AbstractObjectMatrix, parameter_axis: Optional[MirrorParameter] = None):
+    def transform_abstract_matrix(self, abstract_matrix: AbstractObjectMatrix, parameter_axis: Optional[MirrorParameter] = None):
         if parameter_axis is None:
             if self.fixed_parameter is None:
                 raise ValueError("Either axis or fixed_parameter must be specified")
@@ -35,6 +36,15 @@ class Mirror(Transformation):
                 parameter_axis = self.fixed_parameter
 
         for abstract_object in abstract_matrix.abstract_objects:
-            if self.condition is None or self.condition.applies_to(abstract_object):
-                mirror(abstract_object, parameter_axis.axis)
+            self.transform_abstract_object(abstract_object, parameter_axis)
+
+    def transform_abstract_object(self, abstract_object: AbstractObject, parameter_axis: Optional[MirrorParameter] = None):
+        if parameter_axis is None:
+            if self.fixed_parameter is None:
+                raise ValueError("Either axis or fixed_parameter must be specified")
+            else:
+                parameter_axis = self.fixed_parameter
+
+        if self.condition is None or self.condition.applies_to(abstract_object):
+            mirror(abstract_object, parameter_axis.axis)
 

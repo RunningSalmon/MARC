@@ -25,10 +25,10 @@ class Translate(Transformation):
     def __init__(self, parameter_direction: TranslateParameter = None, condition: Optional[Condition] = None):
         super().__init__(parameter_direction, condition)
 
-    def from_parameter(self, parameter: Optional[TranslateParameter] = None) -> 'Translate':
-        return Translate(parameter)
+    def from_parameter_condition(self, parameter: Optional[TranslateParameter] = None, condition: Optional[Condition] = None) -> 'Translate':
+        return Translate(parameter, condition)
 
-    def transform(self, abstract_matrix: AbstractObjectMatrix, parameter_direction: Optional[TranslateParameter] = None):
+    def transform_abstract_matrix(self, abstract_matrix: AbstractObjectMatrix, parameter_direction: Optional[TranslateParameter] = None):
         if parameter_direction is None:
             if self.fixed_parameter is None:
                 raise ValueError("Either direction or fixed_parameter must be specified")
@@ -36,6 +36,16 @@ class Translate(Transformation):
                 parameter_direction = self.fixed_parameter
 
         for abstract_object in abstract_matrix.abstract_objects:
-            if self.condition is None or self.condition.applies_to(abstract_object):
-                translate(abstract_object, parameter_direction.direction)
+            self.transform_abstract_object(abstract_object, parameter_direction)
+
+    def transform_abstract_object(self, abstract_object: AbstractObject,
+                                  parameter_direction: Optional[TranslateParameter] = None):
+        if parameter_direction is None:
+            if self.fixed_parameter is None:
+                raise ValueError("Either direction or fixed_parameter must be specified")
+            else:
+                parameter_direction = self.fixed_parameter
+
+        if self.condition is None or self.condition.applies_to(abstract_object):
+            translate(abstract_object, parameter_direction.direction)
 

@@ -4,7 +4,7 @@ import numpy as np
 
 
 class PixelsPerColor(SummaryStatistic):
-    def get_fitness(self, abstract_matrix_pair: AbstractObjectMatrixPair) -> float:
+    def get_fitness(self, abstract_matrix_pair: AbstractMatrixPair) -> float:
         input_matrix = abstract_matrix_pair.input.to_matrix()
         output_matrix = abstract_matrix_pair.output.to_matrix()
         overlapping_count = 0

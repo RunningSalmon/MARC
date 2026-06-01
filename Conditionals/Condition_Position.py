@@ -12,20 +12,24 @@ class ConditionPositionParameter(ConditionParameter):
         self.comparator = comparator
 
     def __repr__(self):
-        return f"all positions {self.comparator} than {self.threshold} on the {self.axis} axis"
+        return f"all positions {self.comparator.name} than {self.threshold} on the {self.axis.name} axis"
 
 class ConditionPosition(Condition):
-    def __init__(self, parameter_position: ConditionPositionParameter):
-        self.position_parameter = parameter_position
+    def __init__(self, parameter_position: Optional[ConditionPositionParameter] = None):
+        super().__init__(parameter_position)
 
     def applies_to(self, abstract_object: AbstractObject):
-        object_position = abstract_object.Position_Y if self.position_parameter.axis == Axis.Vertical else abstract_object.Position_X
-        if self.position_parameter.comparator == SmallerOrLarger.smaller:
-            return object_position <= self.position_parameter.threshold
+        if self.fixed_parameter is None:
+            raise ValueError("ConditionPosition has no parameter for application")
+        object_position = abstract_object.Position_Y if self.fixed_parameter.axis == Axis.Vertical else abstract_object.Position_X
+        if self.fixed_parameter.comparator == SmallerOrLarger.smaller:
+            return object_position <= self.fixed_parameter.threshold
         else:
-            return object_position >= self.position_parameter.threshold
+            return object_position >= self.fixed_parameter.threshold
 
     def explains_grouping(self, affected_group: list[AbstractObject], unaffected_group: list[AbstractObject]) -> list['ConditionPosition']:
+        if not affected_group or not unaffected_group:
+            return []
         possible_explanations = []
 
         min_x_affected = min(affected_obj.Position_X for affected_obj in affected_group)

@@ -1,4 +1,5 @@
-
+from Conditionals.ConditionShape import ConditionShape
+from Conditionals.Condition_Position import ConditionPosition
 from Evaluation.Matrix_Pair_Evaluation import *
 from Evaluation.Feature_Color import *
 from Evaluation.Feature_Position import *
@@ -100,11 +101,11 @@ if __name__ == '__main__':
 
 
 
-    template_task_1 = load_arc_task_from_json("Template_Task_1.json", "ARC_Generator_JSONs")
+    template_task_1 = load_arc_task_from_json("Squares_and_Triangles.json", "ARC_Generator_JSONs")
     #print(template_task_1)
     template_task_1 = template_task_1.to_abstract_task()
-    rot_90_conditioned = Transformations.rot90.value
-    rot_90_conditioned.condition = ConditionColor(ConditionColorParameter(ArcColor(1)))
+    rot_90_conditioned = copy.deepcopy(Transformations.rot90.value)
+    rot_90_conditioned.condition = ConditionColor(ConditionColorParameter(ArcColor(4)))
     manipulations = [rot_90_conditioned]
     eval_features = [FeatureColor(),
                     FeaturePosition(),
@@ -118,6 +119,10 @@ if __name__ == '__main__':
                   Recolor(),
                   Rotate(),
                   Translate(),]
+    conditions = [ConditionColor(),
+                  ConditionPosition(),
+                  ConditionShape(),]
+    conditions = [ConditionColor(),]
     manipulate_arc_task(template_task_1, manipulations)
     print(abstract_task_to_arc_task(template_task_1))
 
@@ -133,8 +138,8 @@ if __name__ == '__main__':
 
 
 
-    #solution, visited, steps = mdl_search(template_task_1, transforms, eval_features, statistics)
-    #print(f"found solution:\n {solution}\n in {steps} steps. \nvisited:\n{visited}")
+    solution, visited, steps = mdl_search(template_task_1, transforms, eval_features, statistics, conditions)
+    print(f"found solution:\n {solution}\n in {steps} steps. \nvisited:\n{visited}")
 
 
     #print(first_input)

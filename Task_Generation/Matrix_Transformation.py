@@ -8,14 +8,14 @@ def manipulate_abstract_matrix(abstract_matrix: AbstractObjectMatrix, transforma
     for transformation in transformation_series:
         if not transformation.fixed_parameter:
             raise ValueError("Transformations need to be parameterized for matrix_manipulation.")
-        transformation.transform(abstract_matrix)
+        transformation.transform_abstract_matrix(abstract_matrix)
 
 def manipulate_arc_task(arc_task: AbstractARCTask, transformation_series: list[Transformation]):
     training_trials = arc_task.train
     for trial in training_trials:
         manipulate_abstract_matrix(trial.output, transformation_series)
 
-def abstract_pair_to_matrix_pair(abstract_matrix_pair: AbstractObjectMatrixPair) -> MatrixPair:
+def abstract_pair_to_matrix_pair(abstract_matrix_pair: AbstractMatrixPair) -> MatrixPair:
     matrix_pair = abstract_matrix_pair.to_matrix_pair()
     input_color_matrix = ColorMatrix(matrix_pair[0])
     output_color_matrix = ColorMatrix(matrix_pair[1])

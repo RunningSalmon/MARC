@@ -7,20 +7,18 @@ class Feature(ABC):
         pass
 
     def evaluate_abstract_matrix_pair(self, abstract_matrix_pair: AbstractMatrixPair):
-        score = 0
+        scores = []
 
         input_matrix = abstract_matrix_pair.input
         output_matrix = abstract_matrix_pair.output
         input_objects = input_matrix.abstract_objects
         output_objects = output_matrix.abstract_objects
-        mean_score = 0
 
         if not abstract_matrix_pair.mapping:
             raise(NotImplementedError("evaluate_abstract_matrix_pair needs an object pairing"))
 
-        for (input_id, output_id_list) in abstract_matrix_pair.mapping.items():
-            for output_id in output_id_list:
-                score += (self.evaluate_objects(input_objects[input_id], output_objects[output_id], (input_matrix.height, input_matrix.width)))
-            mean_score = score / len(output_id_list)
+        for input_id, output_id in abstract_matrix_pair.mapping.items(): #iterate over objects
+            scores.append (self.evaluate_objects(input_objects[input_id], output_objects[output_id], (input_matrix.height, input_matrix.width)))
+        mean_score = np.mean(scores)
 
-        return mean_score/len(input_objects)
+        return mean_score

@@ -20,11 +20,11 @@ class FeatureHeapItem:
 
 def check_paring_ambiguity(pairing: dict):
     """returns true if every object from the output matrix appears only once in the pairing"""
-    paired_objects_indices = []
+    paired_output_objects_indices = []
     for idx, paired_idx in pairing.items():
-        if paired_idx in paired_objects_indices:
+        if paired_idx in paired_output_objects_indices:
             return False
-        paired_objects_indices.append(paired_idx)
+        paired_output_objects_indices.append(paired_idx)
     return True
 
 def create_object_mapping(abstract_matrix_pair: AbstractMatrixPair, eval_features: list[Feature]):
@@ -52,7 +52,7 @@ def create_object_mapping(abstract_matrix_pair: AbstractMatrixPair, eval_feature
                     if score > highest_score:
                         highest_score = score
                         best_fit_idx2 = idx2
-                feature_pairing[idx1] = [best_fit_idx2]
+                feature_pairing[idx1] = best_fit_idx2
 
             if check_paring_ambiguity(feature_pairing):
                 mapped_matrix_pair = copy.deepcopy(abstract_matrix_pair)

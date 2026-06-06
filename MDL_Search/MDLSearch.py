@@ -227,7 +227,7 @@ def transform_eval_matrix_pair_conditioned(abstract_matrix_pair: AbstractMatrixP
                                            conditions: list[Condition]):
     if parameterized_transformation.fixed_parameter is None:
         raise ValueError("check for condition needs parameterized transformation")
-    input_matrix = abstract_matrix_pair.input
+    input_matrix = copy.deepcopy(abstract_matrix_pair.input)
     output_matrix = abstract_matrix_pair.output
     matrix_shape = input_matrix.height, input_matrix.width
     positive_change = []

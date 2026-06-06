@@ -25,10 +25,11 @@ class AbstractObjectMatrix:
         for obj in self.abstract_objects:
             obj_height, obj_width = obj.Shape_Matrix.shape
             x, y = obj.Position_X, obj.Position_Y
-            for i in range(0, obj_height):
-                for j in range(0, obj_width):
-                    if obj.Shape_Matrix[i][j] == 1 and i+y <= self.height - 1 and j+x <= self.width - 1 and x >= 0 and y >= 0:
-                        color_matrix[i+y][j+x] = obj.Color.value
+            for i in range(obj_height):
+                for j in range(obj_width):
+                    px, py = j + x, i + y
+                    if obj.Shape_Matrix[i][j] == 1 and 0 <= px < self.width and 0 <= py < self.height:
+                        color_matrix[py][px] = obj.Color.value
         return color_matrix
 
 class AbstractMatrixPair:

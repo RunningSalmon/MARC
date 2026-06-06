@@ -99,14 +99,13 @@ if __name__ == '__main__':
     #    score_shape = evaluate_abstract_matrix_pair(matrix_pair, [FeatureShape()])
     #    print(score_shape)
 
-
-
-    template_task_1 = load_arc_task_from_json("Squares_and_Triangles.json", "ARC_Generator_JSONs")
-    #print(template_task_1)
+    template_task_1 = load_arc_task_from_json("Template_Task_1.json", "ARC_Generator_JSONs")
+    # print(template_task_1)
     template_task_1 = template_task_1.to_abstract_task()
     rot_90_conditioned = copy.deepcopy(Transformations.rot90.value)
     rot_90_conditioned.condition = ConditionColor(ConditionColorParameter(ArcColor(4)))
-    manipulations = [Transformations.tra_up.value, rot_90_conditioned, Transformations.rec_7.value]
+    manipulations = [Transformations.tra_left.value, Transformations.tra_left.value, Transformations.tra_left.value,
+                     Transformations.tra_left.value]
     eval_features = [FeatureColor(),
                     FeaturePosition(),
                     FeatureShape()]
@@ -122,6 +121,7 @@ if __name__ == '__main__':
     conditions = [ConditionColor(),
                   ConditionPosition(),
                   ConditionShape(),]
+    conditions = []
     manipulate_arc_task(template_task_1, manipulations)
     print(abstract_task_to_arc_task(template_task_1))
 

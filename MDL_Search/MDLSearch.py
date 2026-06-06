@@ -189,7 +189,7 @@ def mdl_search(abstract_arc_task: AbstractARCTask,
     heap, primitive_transformations = initialize_mdl_search(abstract_arc_task, transformations, eval_features, statistics, conditions)
     visited = set()
 
-    max_step_nr = 20
+    max_step_nr = 100
     step = 0
 
     #debug

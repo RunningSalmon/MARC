@@ -13,7 +13,7 @@ class TransformationParameter(ABC):
         pass
 
 class Transformation(ABC):
-    parameters: list[TransformationParameter] = []
+    possible_parameters: list[TransformationParameter] = []
 
     @abstractmethod
     def __init__(self, parameter: Optional[TransformationParameter] = None, condition: Condition = None):
@@ -39,7 +39,7 @@ class Transformation(ABC):
         pass
 
     def get_nll(self, nr_of_algos: int) -> float:
-        if not self.parameters:
+        if not self.possible_parameters:
             raise ValueError("parameters are not specified")
 
         class_nll = -log(1/nr_of_algos)

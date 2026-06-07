@@ -20,7 +20,7 @@ class TranslateParameter(TransformationParameter):
 
 
 class Translate(Transformation):
-    parameters = TranslateParameter.possible_values()
+    possible_parameters = TranslateParameter.possible_values()
 
     def __init__(self, parameter_direction: TranslateParameter = None, condition: Optional[Condition] = None):
         super().__init__(parameter_direction, condition)

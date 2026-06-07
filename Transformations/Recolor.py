@@ -22,7 +22,7 @@ class RecolorParameter(TransformationParameter):
         return self.color.name
 
 class Recolor(Transformation):
-    parameters = RecolorParameter.possible_values()
+    possible_parameters = RecolorParameter.possible_values()
 
     def __init__(self, parameter_color: Optional[RecolorParameter] = None, condition: Optional[Condition] = None):
         super().__init__(parameter_color, condition)

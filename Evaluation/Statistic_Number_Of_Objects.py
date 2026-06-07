@@ -14,7 +14,7 @@ class NumberOfObjects(SummaryStatistic):
 
 
 def count_visible_objects(abstract_matrix) -> int:
-    count = 0g
+    count = 0
     for obj in abstract_matrix.abstract_objects:
         obj_h, obj_w = obj.Shape_Matrix.shape
         x, y = obj.Position_X, obj.Position_Y

@@ -20,7 +20,7 @@ class DuplicationParameter(TransformationParameter):
         return self.direction.name
 
 class Duplicate(Transformation):
-    parameters = DuplicationParameter.possible_values()
+    possible_parameters = DuplicationParameter.possible_values()
 
     def __init__(self, direction: DuplicationParameter = None, condition: Optional[Condition] = None):
         super().__init__(direction, condition)

@@ -19,7 +19,7 @@ class RotationParameter(TransformationParameter):
         return self.degree.name
 
 class Rotate(Transformation):
-    parameters = RotationParameter.possible_values()
+    possible_parameters = RotationParameter.possible_values()
 
     def __init__(self, parameter_degree: RotationParameter = None, condition: Optional[Condition] = None):
         super().__init__(parameter_degree, condition)

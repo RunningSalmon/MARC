@@ -19,7 +19,7 @@ class MirrorParameter(TransformationParameter):
         return self.axis.name + " axis"
 
 class Mirror(Transformation):
-    parameters = MirrorParameter.possible_values()
+    possible_parameters = MirrorParameter.possible_values()
 
     def __init__(self, parameter_axis: MirrorParameter = None, condition: Optional[Condition] = None):
         super().__init__(parameter_axis, condition)

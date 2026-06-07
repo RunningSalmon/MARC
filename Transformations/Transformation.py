@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from math import log
+from sqlite3.dbapi2 import paramstyle
 from typing import Optional
 
 from Datatypes.Abstract_ARC_Task import *
@@ -38,10 +39,22 @@ class Transformation(ABC):
     def transform_abstract_object(self, abstract_object: AbstractObject, parameter: Optional[TransformationParameter] = None):
         pass
 
-    def get_nll(self, nr_of_algos: int) -> float:
+    def get_nll(self, nr_of_algos: int, nr_of_conditions: int = 0) -> float:
         if not self.possible_parameters:
             raise ValueError("parameters are not specified")
 
+        if self.fixed_parameter:
+            parameter_nll = 0
+        else:
+            parameter_nll = -log(1/len(self.possible_parameters))
+
+        if nr_of_conditions > 0:
+            condition_nll = -log(1/nr_of_conditions)
+        else:
+            condition_nll = 0
+
         class_nll = -log(1/nr_of_algos)
 
-        return class_nll
+        nll = class_nll + parameter_nll + condition_nll
+
+        return nll

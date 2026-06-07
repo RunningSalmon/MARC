@@ -36,7 +36,7 @@ class Rotate(Transformation):
 
         for abstract_object in abstract_matrix.abstract_objects:
             if self.condition is None or self.condition.applies_to(abstract_object):
-                self.transform_abstract_object(abstract_object, parameter_degree)
+                rotate(abstract_object, parameter_degree.degree)
 
     def transform_abstract_object(self, abstract_object: AbstractObject, parameter_degree: Optional[RotationParameter] = None):
         if parameter_degree is None:

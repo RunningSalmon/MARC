@@ -34,7 +34,7 @@ def initialize_mdl_search(abstract_arc_task: AbstractARCTask,
 
     for transformation in transformations:  # iterate over transformations
         params = transformation.possible_parameters
-        nll = transformation.get_nll(len(transformations))
+        nll = transformation.get_nll(len(transformations), len(conditions))
         for param in params:  # iterate over all possible parameters for transformation
             transform_param_scores = []
             transformed_matrices = []
@@ -143,7 +143,7 @@ def mdl_search_step(abstract_matrix_pair: AbstractARCTask,
             anticipatory_matrices.append(transformed_matrix)
 
         mean_transform_score = np.mean(transform_scores)
-        nll = transformation.get_nll(len(primitive_transformations))
+        nll = transformation.get_nll(len(primitive_transformations), len(conditions))
         new_transformation_series_nll = transformation_series_nll + nll
         new_transformation_series_mdl = (1 - mean_transform_score) * new_transformation_series_nll
 
@@ -176,7 +176,7 @@ def mdl_search_step(abstract_matrix_pair: AbstractARCTask,
                     anticipatory_matrices.append(manipulatable_transformed_matrix)
                 mean_score = float(np.mean(scores))
                 if mean_score > mean_transform_score:
-                    nll = conditioned_transformation.get_nll(len(primitive_transformations))
+                    nll = conditioned_transformation.get_nll(len(primitive_transformations), len(conditions))
                     new_transformation_series_nll = transformation_series_nll + nll
                     new_transformation_series_mdl = (1 - mean_score) * new_transformation_series_nll
                     accumulated_transforms = transforms + [conditioned_transformation]

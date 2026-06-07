@@ -221,7 +221,7 @@ def mdl_search(abstract_arc_task: AbstractARCTask,
         print_heap = copy.deepcopy(heap)
         while print_heap:
             item = heapq.heappop(print_heap)
-            print(f"heap in step {step}: score: {item.mdl}, transforms: {item.transforms}")
+            print(f"heap in step {step}: mdl: {item.mdl}, nll: {item.nll}, transforms: {item.transforms}")
 
         # check if the currently best heap item is a solution
         heap_item: HeapItem = heap[0]

@@ -259,10 +259,10 @@ def transform_eval_matrix_pair_conditioned(abstract_matrix_pair: AbstractMatrixP
                 input_obj_idx]  # no copy for manipulatable input object since it should transform the manipulatable matrix
             output_obj = output_matrix.abstract_objects[output_obj_idx]
             current_score = evaluate_abstract_object_pair(input_obj, output_obj, eval_features,
-                                                          matrix_shape)  # evaluate before transform
+                                                          abstract_matrix_pair)  # evaluate before transform
             parameterized_transformation.transform_abstract_object(input_obj, parameter)  # transform single object
             new_score = evaluate_abstract_object_pair(input_obj, output_obj, eval_features,
-                                                      matrix_shape)  # evaluate after transform
+                                                      abstract_matrix_pair)  # evaluate after transform
             scores.append(new_score)
             if new_score > current_score:  # object transformation had a positive effect
                 positive_change.append(input_obj)

@@ -135,7 +135,10 @@ if __name__ == '__main__':
     #score = evaluate_abstract_matrix_pair(test_matrix_pair, eval_features)
     #print(score)
 
-
+    #mappings = []
+    #for matrix_pair in template_task_1.train:
+    #    mappings.append(create_object_mapping(matrix_pair, eval_features))
+    # print(mappings)
 
     solution, visited, steps = mdl_search(template_task_1, transforms, eval_features, statistics, conditions)
     print(f"found solution:\n {solution}\n in {steps} steps. \nvisited:\n{visited}")

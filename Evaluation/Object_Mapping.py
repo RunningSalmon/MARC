@@ -48,7 +48,7 @@ def create_object_mapping(abstract_matrix_pair: AbstractMatrixPair, eval_feature
                 highest_score = 0
                 best_fit_idx2 = 0
                 for idx2 in range(len(output_objects)):
-                    score = evaluate_abstract_object_pair(input_objects[idx1], output_objects[idx2], [feature], matrix_shape)
+                    score = evaluate_abstract_object_pair(input_objects[idx1], output_objects[idx2], [feature], abstract_matrix_pair)
                     if score > highest_score:
                         highest_score = score
                         best_fit_idx2 = idx2

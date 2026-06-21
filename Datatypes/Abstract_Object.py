@@ -8,12 +8,29 @@ class AbstractObject:
     Color: ArcColor
 
     def __init__(self, position: tuple[int, int], shape: np.ndarray, color: ArcColor):
-        self.Position_Y = position[0]
-        self.Position_X = position[1]
-        self.Shape_Matrix: np.ndarray = shape
         if color is ArcColor.Black:
             raise ValueError(f"Objects cant be colored in the background color")
+
+        top_left_y, top_left_x = position
+        height, width = shape.shape
+
+        # Geometrischer Mittelpunkt der Bounding Box (kann .5 sein bei gerader Höhe/Breite)
+        self.Center_Y = top_left_y + (height - 1) / 2
+        self.Center_X = top_left_x + (width - 1) / 2
+        self.Shape_Matrix = shape
         self.Color = color
+
+    @property
+    def Position_X(self) -> int:
+        """Top-left X, abgeleitet aus Center_X und der aktuellen Shape-Breite."""
+        width = self.Shape_Matrix.shape[1]
+        return round(self.Center_X - (width - 1) / 2)
+
+    @property
+    def Position_Y(self) -> int:
+        """Top-left Y, abgeleitet aus Center_Y und der aktuellen Shape-Höhe."""
+        height = self.Shape_Matrix.shape[0]
+        return round(self.Center_Y - (height - 1) / 2)
 
     def __str__(self):
         colored_matrix = np.zeros(self.Shape_Matrix.shape)

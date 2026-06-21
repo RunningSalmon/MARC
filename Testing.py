@@ -99,13 +99,13 @@ if __name__ == '__main__':
     #    score_shape = evaluate_abstract_matrix_pair(matrix_pair, [FeatureShape()])
     #    print(score_shape)
 
-    template_task_1 = load_arc_task_from_json("Template_Task_1.json", "ARC_Generator_JSONs")
+    template_task_1 = load_arc_task_from_json("template_task_1.json", "ARC_Generator_JSONs")
     # print(template_task_1)
     template_task_1 = template_task_1.to_abstract_task()
+    template_task_1.to_matplot()
     rot_90_conditioned = copy.deepcopy(Transformations.rot90.value)
     rot_90_conditioned.condition = ConditionColor(ConditionColorParameter(ArcColor(4)))
-    manipulations = [Transformations.tra_left.value, Transformations.tra_left.value, Transformations.tra_left.value,
-                     Transformations.tra_left.value]
+    manipulations = [Transformations.rot90.value]
     eval_features = [FeatureColor(),
                     FeaturePosition(),
                     FeatureShape()]
@@ -121,9 +121,11 @@ if __name__ == '__main__':
     conditions = [ConditionColor(),
                   ConditionPosition(),
                   ConditionShape(),]
-    conditions = []
+    #conditions = []
     manipulate_arc_task(template_task_1, manipulations)
     print(abstract_task_to_arc_task(template_task_1))
+
+    template_task_1.to_matplot()
 
     #test_matrix_pair = template_task_1.train[0]
     #test_matrix_pair.pairing = create_object_mapping(test_matrix_pair, eval_features, transformations)
@@ -140,8 +142,8 @@ if __name__ == '__main__':
     #    mappings.append(create_object_mapping(matrix_pair, eval_features))
     # print(mappings)
 
-    solution, visited, steps = mdl_search(template_task_1, transforms, eval_features, statistics, conditions)
-    print(f"found solution:\n {solution}\n in {steps} steps. \nvisited:\n{visited}")
+    #solution, visited, steps = mdl_search(template_task_1, transforms, eval_features, statistics, conditions)
+    #print(f"found solution:\n {solution}\n in {steps} steps. \nvisited:\n{visited}")
 
 
     #print(first_input)

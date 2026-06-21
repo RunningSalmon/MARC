@@ -1,4 +1,9 @@
+from matplotlib.patches import FancyArrowPatch
+
 from Datatypes.Abstract_Object import *
+import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
+from Datatypes.Abstract_Object import ArcColor
 
 class AbstractObjectMatrix:
     height: int
@@ -32,6 +37,39 @@ class AbstractObjectMatrix:
                         color_matrix[py][px] = obj.Color.value
         return color_matrix
 
+    # matplot visualization
+    def to_matplot(self, ax=None, title=None, show_grid=True):
+        ARC_COLORMAP = ListedColormap(
+            [c.to_hex() for c in sorted(ArcColor, key=lambda c: c.value)]
+        )
+
+        matrix = self.to_matrix()
+
+        own_fig = ax is None
+        if own_fig:
+            fig, ax = plt.subplots(figsize=(self.width / 2, self.height / 2))
+
+        ax.imshow(matrix, cmap=ARC_COLORMAP, vmin=0, vmax=9)
+
+        ax.set_xticks(np.arange(-0.5, self.width, 1), minor=True)
+        ax.set_yticks(np.arange(-0.5, self.height, 1), minor=True)
+        if show_grid:
+            ax.grid(which='minor', color='gray', linewidth=0.5)
+        ax.tick_params(which='both', bottom=False, left=False,
+                       labelbottom=False, labelleft=False)
+
+        for spine in ax.spines.values():
+            spine.set_visible(False)
+
+        if title:
+            ax.set_title(title)
+
+        if own_fig:
+            plt.tight_layout()
+            plt.show()
+
+        return ax
+
 class AbstractMatrixPair:
     input: AbstractObjectMatrix
     output: AbstractObjectMatrix
@@ -60,6 +98,31 @@ class AbstractMatrixPair:
             for id1, id2 in self.mapping.items():
                 print(f"Pairing {id1}: \n{input_objects[id1]}\n {output_objects[id2]}")
 
+    def to_matplot(self, ax_input=None, ax_output=None, label=""):
+        """
+        Visualisiert Input und Output nebeneinander mit einem Pfeil dazwischen.
+        `label` wird den Titeln vorangestellt, z.B. "Train 0" -> "Train 0 – Input".
+        """
+        own_fig = ax_input is None or ax_output is None
+        if own_fig:
+            fig, (ax_input, ax_output) = plt.subplots(1, 2, figsize=(
+                (self.input.width + self.output.width) / 2 + 1,
+                max(self.input.height, self.output.height) / 2 + 1
+            ))
+        else:
+            fig = ax_input.figure
+
+        prefix = f"{label} – " if label else ""
+        self.input.to_matplot(ax=ax_input, title=f"{prefix}Input")
+        self.output.to_matplot(ax=ax_output, title=f"{prefix}Output")
+
+        if own_fig:
+            plt.tight_layout()
+
+        if own_fig:
+            plt.show()
+
+        return (ax_input, ax_output)
 
 class AbstractARCTask:
     train: list[AbstractMatrixPair]
@@ -75,3 +138,25 @@ class AbstractARCTask:
         return (f"AbstractObjectARCTask(\n"
                 f"train:\n{train_str},\n"
                 f"test:\n{test_str}\n)")
+
+    def to_matplot(self):
+        """
+        Visualisiert alle Train- und Test-Pairs untereinander, indem es
+        AbstractMatrixPair.to_matplot pro Zeile wiederverwendet.
+        """
+        all_pairs = [(f"Train {i}", pair) for i, pair in enumerate(self.train)] + \
+                    [(f"Test {i}", pair) for i, pair in enumerate(self.test)]
+
+        n_rows = len(all_pairs)
+        fig, axes = plt.subplots(n_rows, 2, figsize=(6, 3 * n_rows))
+
+        if n_rows == 1:
+            axes = axes.reshape(1, 2)
+
+        for row, (label, pair) in enumerate(all_pairs):
+            pair.to_matplot(ax_input=axes[row][0], ax_output=axes[row][1], label=label)
+
+        plt.tight_layout()
+        plt.show()
+
+        return fig, axes

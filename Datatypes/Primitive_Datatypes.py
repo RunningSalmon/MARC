@@ -1,4 +1,5 @@
 from enum import Enum
+import re
 
 Printing_Colors = {
     0: "\033[48;2;0;0;0m",        # Black (background)
@@ -27,6 +28,12 @@ class ArcColor(Enum):
     Orange = 7
     Azure = 8
     Maroon = 9
+
+    def to_hex(self) -> str:
+        """Wandelt den ANSI-True-Color-Code dieser Farbe in einen Hex-Code um."""
+        match = re.search(r'(\d+);(\d+);(\d+)m$', Printing_Colors[self.value])
+        r, g, b = (int(x) for x in match.groups())
+        return f'#{r:02x}{g:02x}{b:02x}'
 
 class Direction(Enum):
     Up = 0

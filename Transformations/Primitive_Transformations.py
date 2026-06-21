@@ -42,12 +42,19 @@ def duplicate_matrix(matrix: np.ndarray, direction: Direction):
 
 def duplicate(abstract_object: AbstractObject, direction: Direction):
     height, width = abstract_object.Shape_Matrix.shape
+    top_left_y = abstract_object.Position_Y
+    top_left_x = abstract_object.Position_X
+
     if direction == Direction.Up:
-        abstract_object.Position_Y -= height
+        top_left_y -= height
     elif direction == Direction.Left:
-        abstract_object.Position_X -= width
+        top_left_x -= width
 
     abstract_object.Shape_Matrix = duplicate_matrix(abstract_object.Shape_Matrix, direction)
+
+    # Re-apply explicitly: setter now uses the NEW (already-tiled) shape dims
+    abstract_object.Position_Y = top_left_y
+    abstract_object.Position_X = top_left_x
 
 def recolor(abstract_object: AbstractObject, color: ArcColor):
     abstract_object.Color = color

@@ -2,8 +2,6 @@ import numpy as np
 
 from Datatypes.Primitive_Datatypes import *
 class AbstractObject:
-    Position_X: int
-    Position_Y: int
     Shape_Matrix: np.ndarray
     Color: ArcColor
 
@@ -31,6 +29,16 @@ class AbstractObject:
         """Top-left Y, abgeleitet aus Center_Y und der aktuellen Shape-Höhe."""
         height = self.Shape_Matrix.shape[0]
         return round(self.Center_Y - (height - 1) / 2)
+
+    @Position_X.setter
+    def Position_X(self, value: int):
+        width = self.Shape_Matrix.shape[1]
+        self.Center_X = value + (width - 1) / 2
+
+    @Position_Y.setter
+    def Position_Y(self, value: int):
+        height = self.Shape_Matrix.shape[0]
+        self.Center_Y = value + (height - 1) / 2
 
     def __str__(self):
         colored_matrix = np.zeros(self.Shape_Matrix.shape)

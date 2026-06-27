@@ -12,7 +12,10 @@ def manipulate_abstract_matrix(abstract_matrix: AbstractObjectMatrix, transforma
 
 def manipulate_arc_task(arc_task: AbstractARCTask, transformation_series: list[Transformation]):
     training_trials = arc_task.train
+    test_trials = arc_task.test
     for trial in training_trials:
+        manipulate_abstract_matrix(trial.output, transformation_series)
+    for trial in test_trials:
         manipulate_abstract_matrix(trial.output, transformation_series)
 
 def abstract_pair_to_matrix_pair(abstract_matrix_pair: AbstractMatrixPair) -> MatrixPair:

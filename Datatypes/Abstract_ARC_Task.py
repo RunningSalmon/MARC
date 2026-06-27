@@ -1,4 +1,4 @@
-from matplotlib.patches import FancyArrowPatch
+from matplotlib.patches import FancyArrowPatch, Rectangle
 
 from Datatypes.Abstract_Object import *
 import matplotlib.pyplot as plt
@@ -39,22 +39,23 @@ class AbstractObjectMatrix:
 
     # matplot visualization
     def to_matplot(self, ax=None, title=None, show_grid=True):
-        ARC_COLORMAP = ListedColormap(
-            [c.to_hex() for c in sorted(ArcColor, key=lambda c: c.value)]
-        )
-
         matrix = self.to_matrix()
-
         own_fig = ax is None
         if own_fig:
             fig, ax = plt.subplots(figsize=(self.width / 2, self.height / 2))
 
-        ax.imshow(matrix, cmap=ARC_COLORMAP, vmin=0, vmax=9)
+        for (row, col), value in np.ndenumerate(matrix):
+            color = ArcColor(int(value)).to_hex()
+            ax.add_patch(Rectangle((col, row), 1, 1, facecolor=color, edgecolor='none'))
 
-        ax.set_xticks(np.arange(-0.5, self.width, 1), minor=True)
-        ax.set_yticks(np.arange(-0.5, self.height, 1), minor=True)
+        ax.set_xlim(0, self.width)
+        ax.set_ylim(self.height, 0)  # invertiert, damit (0,0) oben links bleibt
+        ax.set_aspect('equal')
+
         if show_grid:
-            ax.grid(which='minor', color='gray', linewidth=0.5)
+            ax.set_xticks(np.arange(0, self.width + 1, 1), minor=False)
+            ax.set_yticks(np.arange(0, self.height + 1, 1), minor=False)
+            ax.grid(which='major', color='gray', linewidth=0.5)
         ax.tick_params(which='both', bottom=False, left=False,
                        labelbottom=False, labelleft=False)
 
@@ -114,7 +115,7 @@ class AbstractMatrixPair:
 
         prefix = f"{label} – " if label else ""
         self.input.to_matplot(ax=ax_input, title=f"{prefix}Input")
-        self.output.to_matplot(ax=ax_output, title=f"{prefix}Output")
+        self.output.to_matplot(ax=ax_output, title=f"{prefix}Target")
 
         if own_fig:
             plt.tight_layout()

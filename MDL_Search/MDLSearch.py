@@ -30,12 +30,12 @@ def initialize_mdl_search(abstract_arc_task: AbstractARCTask,
     training_pairs = abstract_arc_task.train
     heap = []
     primitive_transformations = []
-    possible_conditions = set()
 
     for transformation in transformations:  # iterate over transformations
         params = transformation.possible_parameters
         nll = transformation.get_nll(len(transformations), len(conditions))
         for param in params:  # iterate over all possible parameters for transformation
+            possible_conditions = set()
             transform_param_scores = []
             transformed_matrices = []
             for abstract_matrix_pair in training_pairs:  # iterate over trials
@@ -68,13 +68,13 @@ def initialize_mdl_search(abstract_arc_task: AbstractARCTask,
 
             if possible_conditions:
                 for condition in possible_conditions:
-                    transformation = copy.deepcopy(transformation)
-                    transformation.condition = condition
+                    transform = copy.deepcopy(transformation)
+                    transform.condition = condition
                     scores = []
                     transformed_matrices = []
                     for abstract_matrix_pair in training_pairs:  # iterate over trials
                         transform_param_results = transform_eval_matrix_pair(abstract_matrix_pair,
-                                                                             transformation,
+                                                                             transform,
                                                                              param,
                                                                              eval_features,
                                                                              statistics, )
@@ -85,7 +85,7 @@ def initialize_mdl_search(abstract_arc_task: AbstractARCTask,
                     if mean_score > mean_transform_param_score:
                         mdl = nll * (1 - mean_score)
                         heapq.heappush(heap,
-                                       HeapItem(mdl, nll, [transformation.from_parameter_condition(param, condition)],
+                                       HeapItem(mdl, nll, [transform.from_parameter_condition(param, condition)],
                                                 transformed_matrices))
 
     return heap, primitive_transformations
@@ -98,10 +98,11 @@ def mdl_search_step(abstract_matrix_pair: AbstractARCTask,
                     eval_features: list[Feature],
                     statistics: list[SummaryStatistic],
                     conditions: list[Condition]) -> tuple[list, set]:
+
     training_pairs: list[AbstractMatrixPair] = abstract_matrix_pair.train
     item: HeapItem = heapq.heappop(heap)
     transforms: list[Transformation] = item.transforms
-    possible_conditions = set()
+    #print(f"Expanded: {item.transforms} with DL: {item.mdl}")
 
     # check if sequence already visited else append to visited
     key = tuple(repr(transform) for transform in transforms)
@@ -115,6 +116,7 @@ def mdl_search_step(abstract_matrix_pair: AbstractARCTask,
     for transformation in primitive_transformations:
         anticipatory_matrices = []
         transform_scores = []
+        possible_conditions = set()
         for i, abstract_matrix_pair in enumerate(training_pairs):
             manipulatable_transformed_matrix = copy.deepcopy(
                 transformed_matrices[i])  # manipulatable matrix with current series applied
@@ -162,7 +164,7 @@ def mdl_search_step(abstract_matrix_pair: AbstractARCTask,
                 scores = []
                 anticipatory_matrices = []
                 for i, abstract_matrix_pair in enumerate(training_pairs):
-                    manipulatable_transformed_matrix = transformed_matrices[i]
+                    manipulatable_transformed_matrix = copy.deepcopy(transformed_matrices[i])
                     output_matrix = abstract_matrix_pair.output
                     manipulatable_transformed_pair = AbstractMatrixPair(manipulatable_transformed_matrix, output_matrix)
 
@@ -217,11 +219,11 @@ def mdl_search(abstract_arc_task: AbstractARCTask,
     #    print(f"heap in step {step}: score: {item.mdl}, transforms: {item.transforms}")
 
     while heap and step < max_step_nr:
-        # debug
-        print_heap = copy.deepcopy(heap)
-        while print_heap:
-            item = heapq.heappop(print_heap)
-            print(f"heap in step {step}: mdl: {item.mdl}, nll: {item.nll}, transforms: {item.transforms}")
+        ## debug
+        #print_heap = copy.deepcopy(heap)
+        #while print_heap:
+        #    item = heapq.heappop(print_heap)
+        #    print(f"heap in step {step}: mdl: {item.mdl}, nll: {item.nll}, transforms: {item.transforms}")
 
         # check if the currently best heap item is a solution
         heap_item: HeapItem = heap[0]

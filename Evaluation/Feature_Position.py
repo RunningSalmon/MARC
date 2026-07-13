@@ -10,7 +10,8 @@ class FeaturePosition(Feature):
                          abstract_matrix_pair: AbstractMatrixPair) -> float:
         input_matrix = abstract_matrix_pair.input
         output_matrix = abstract_matrix_pair.output
-        all_objects = input_matrix.abstract_objects + output_matrix.abstract_objects
+        all_objects = (input_matrix.abstract_objects + output_matrix.abstract_objects
+                       + [abstract_object_1, abstract_object_2])
 
         max_x = max(obj.Position_X for obj in all_objects)
         max_y = max(obj.Position_Y for obj in all_objects)
@@ -23,6 +24,6 @@ class FeaturePosition(Feature):
                                    abstract_object_2.Position_X - abstract_object_1.Position_X))
 
         if max_possible_distance == 0:
-            return 1.0  # all objects at the same position
+            return 1.0
 
         return float(1 - distance / max_possible_distance)

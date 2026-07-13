@@ -1,3 +1,5 @@
+from tracemalloc import Statistic
+
 from Conditionals.ConditionShape import ConditionShape
 from Conditionals.Condition_Position import ConditionPosition
 from Evaluation.Matrix_Pair_Evaluation import *
@@ -12,7 +14,8 @@ from Evaluation.Statistic_Pixels_Correct import *
 from Evaluation.Statistic_Pixels_Per_Color import *
 
 from Task_Generation.Matrix_Transformation import manipulate_arc_task, abstract_task_to_arc_task, \
-    abstract_pair_to_matrix_pair, manipulate_abstract_matrix
+    abstract_pair_to_matrix_pair, manipulate_abstract_matrix, generate_test_task, generate_test_set, \
+    transform_and_evaluate_test_trials
 
 from Transformations.Recolor import *
 from Transformations.Translate import *
@@ -51,6 +54,24 @@ class Transformations(Enum):
     tra_down = Translate(TranslateParameter(Direction.Down))
     tra_left = Translate(TranslateParameter(Direction.Left))
     tra_right = Translate(TranslateParameter(Direction.Right))
+
+
+
+def run_on_task(task: AbstractARCTask, transforms: list[Transformation], eval_features: list[Feature], statistics: list[SummaryStatistic], conditions: list[Condition]):
+    solution, visited, steps = mdl_search(task, transforms, eval_features, statistics, conditions)
+    is_correct = transform_and_evaluate_test_trials(task, solution)
+    return solution, is_correct, steps
+
+def run_on_multiple_tasks(tasks: list[AbstractARCTask], transforms: list[Transformation], eval_features: list[Feature], statistics: list[SummaryStatistic], conditions: list[Condition]):
+    solutions = []
+    correct_solutions_found = []
+    steps = []
+    for task in tasks:
+        task_solution, is_correct, task_steps = run_on_task(task, transforms, eval_features, statistics, conditions)
+        solutions.append(task_solution)
+        correct_solutions_found.append(is_correct)
+        steps.append(task_steps)
+    return solutions, correct_solutions_found, steps
 
 if __name__ == '__main__':
     # basic_matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
@@ -99,13 +120,18 @@ if __name__ == '__main__':
     #    score_shape = evaluate_abstract_matrix_pair(matrix_pair, [FeatureShape()])
     #    print(score_shape)
 
-    template_task_1 = load_arc_task_from_json("template_task_1.json", "ARC_Generator_JSONs")
+    template_task = load_arc_task_from_json("T5.json", "ARC_Generator_JSONs")
+    template_1 = load_arc_task_from_json("T1.json", "ARC_Generator_JSONs").to_abstract_task()
+    template_2 = load_arc_task_from_json("T2.json", "ARC_Generator_JSONs").to_abstract_task()
+    template_3 = load_arc_task_from_json("T3.json", "ARC_Generator_JSONs").to_abstract_task()
+    template_4 = load_arc_task_from_json("T4.json", "ARC_Generator_JSONs").to_abstract_task()
+    template_5 = load_arc_task_from_json("T5.json", "ARC_Generator_JSONs").to_abstract_task()
     # print(template_task_1)
-    template_task_1 = template_task_1.to_abstract_task()
-    template_task_1.to_matplot()
+    template_task = template_task.to_abstract_task()
+    template_task.to_matplot()
     rot_90_conditioned = copy.deepcopy(Transformations.rot90.value)
     rot_90_conditioned.condition = ConditionColor(ConditionColorParameter(ArcColor(4)))
-    manipulations = [Transformations.rot90.value]
+    manipulations = [Transformations.rot90.value,Transformations.rot270.value, Transformations.dup_down.value, ]
     eval_features = [FeatureColor(),
                     FeaturePosition(),
                     FeatureShape()]
@@ -122,10 +148,12 @@ if __name__ == '__main__':
                   ConditionPosition(),
                   ConditionShape(),]
     #conditions = []
-    manipulate_arc_task(template_task_1, manipulations)
-    print(abstract_task_to_arc_task(template_task_1))
-
-    template_task_1.to_matplot()
+    test_set = generate_test_set([template_5], [3], transforms, conditions,1)
+    #manipulate_arc_task(template_task, manipulations)
+    #print(abstract_task_to_arc_task(test_set[0][0]), test_set[0][1])
+    #solution, visited, steps = mdl_search(template_task, transforms, eval_features, statistics, conditions)
+    #template_task.to_matplot()
+    #print(f"found solution:\n {solution}\n in {steps} steps. \nvisited:\n{visited}")
 
     #test_matrix_pair = template_task_1.train[0]
     #test_matrix_pair.pairing = create_object_mapping(test_matrix_pair, eval_features, transformations)
@@ -142,8 +170,12 @@ if __name__ == '__main__':
     #    mappings.append(create_object_mapping(matrix_pair, eval_features))
     # print(mappings)
 
-    #solution, visited, steps = mdl_search(template_task_1, transforms, eval_features, statistics, conditions)
-    #print(f"found solution:\n {solution}\n in {steps} steps. \nvisited:\n{visited}")
+    solution, visited, steps = mdl_search(test_set[0][0], transforms, eval_features, statistics, conditions)
+    print(f"found solution:\n {solution}\n in {steps} steps. \nvisited:\n{visited}")
+    if solution:
+        correct_solution = transform_and_evaluate_test_trials(test_set[0][0], solution)
+        print(f"correct solution: {correct_solution}")
+
 
 
     #print(first_input)

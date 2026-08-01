@@ -108,7 +108,6 @@ def generate_test_set(templates: list[AbstractARCTask],
             for _ in range(tasks_per_combination):
                 task, series = generate_test_task(template, length, available_transformations, available_conditions)
                 test_set.append((task, series))
-    print(f"applied: {series}")
     return test_set
 
 def apply_to_test_trials(task: AbstractARCTask, series: list[Transformation]):

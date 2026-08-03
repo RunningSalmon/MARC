@@ -16,6 +16,7 @@ class ConditionColorParameter(ConditionParameter):
     def __repr__(self):
         return self.color.name
 
+
 class ConditionColor(Condition):
     def __init__(self, parameter_color: Optional[ConditionColorParameter] = None):
         super().__init__(parameter_color)
@@ -25,7 +26,8 @@ class ConditionColor(Condition):
             raise ValueError("ConditionColor has no parameter for application")
         return abstract_object.Color == self.fixed_parameter
 
-    def explains_grouping(self, affected_group: list[AbstractObject], unaffected_group: list[AbstractObject]) -> list['ConditionColor']:
+    def explains_grouping(self, affected_group: list[AbstractObject], unaffected_group: list[AbstractObject]) -> list[
+        'ConditionColor']:
         if not affected_group or not unaffected_group:
             return []
         affected_color = affected_group[0].Color

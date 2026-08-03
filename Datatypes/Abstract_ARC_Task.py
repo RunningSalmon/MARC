@@ -5,10 +5,12 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from Datatypes.Abstract_Object import ArcColor
 
+
 class AbstractObjectMatrix:
     height: int
     width: int
     abstract_objects: list[AbstractObject]
+
     def __init__(self, height: int, width: int, abstract_objects: list[AbstractObject]):
         self.height = height
         self.width = width
@@ -26,6 +28,12 @@ class AbstractObjectMatrix:
         return np.array_equal(self.to_matrix(), other.to_matrix())
 
     def to_matrix(self):
+        """
+        converts the abstract matrix into a regular color matrix by pasting all abstract objects
+        at their stored position with their stored shape and color into it.
+
+        :return: color matrix in the form of an nd-array
+        """
         color_matrix = np.zeros((self.height, self.width))
         for obj in self.abstract_objects:
             obj_height, obj_width = obj.Shape_Matrix.shape
@@ -39,6 +47,9 @@ class AbstractObjectMatrix:
 
     # matplot visualization
     def to_matplot(self, ax=None, title=None, show_grid=True):
+        """
+        plots the abstract matrix as a color matrix
+        """
         matrix = self.to_matrix()
         own_fig = ax is None
         if own_fig:
@@ -71,12 +82,14 @@ class AbstractObjectMatrix:
 
         return ax
 
+
 class AbstractMatrixPair:
     input: AbstractObjectMatrix
     output: AbstractObjectMatrix
     mapping = {}
 
-    def __init__(self, abstract_input: AbstractObjectMatrix, abstract_output: AbstractObjectMatrix, object_pairing = None):
+    def __init__(self, abstract_input: AbstractObjectMatrix, abstract_output: AbstractObjectMatrix,
+                 object_pairing=None):
         self.input = abstract_input
         self.output = abstract_output
         if object_pairing:
@@ -101,8 +114,7 @@ class AbstractMatrixPair:
 
     def to_matplot(self, ax_input=None, ax_output=None, label=""):
         """
-        Visualisiert Input und Output nebeneinander mit einem Pfeil dazwischen.
-        `label` wird den Titeln vorangestellt, z.B. "Train 0" -> "Train 0 – Input".
+        visualizes input and output matrices side by side.
         """
         own_fig = ax_input is None or ax_output is None
         if own_fig:
@@ -125,6 +137,7 @@ class AbstractMatrixPair:
 
         return (ax_input, ax_output)
 
+
 class AbstractARCTask:
     train: list[AbstractMatrixPair]
     test: list[AbstractMatrixPair]
@@ -142,8 +155,7 @@ class AbstractARCTask:
 
     def to_matplot(self):
         """
-        Visualisiert alle Train- und Test-Pairs untereinander, indem es
-        AbstractMatrixPair.to_matplot pro Zeile wiederverwendet.
+        visualizes all pairs of the task in one plot.
         """
         all_pairs = [(f"Train {i}", pair) for i, pair in enumerate(self.train)] + \
                     [(f"Test {i}", pair) for i, pair in enumerate(self.test)]

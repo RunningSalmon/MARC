@@ -9,13 +9,17 @@ from Transformations.Transformation import *
 import random
 import copy
 
+
 def manipulate_abstract_matrix(abstract_matrix: AbstractObjectMatrix, transformation_series: list[Transformation]):
+    """transforms all objects in the output matrices of a given AbstractObjectMatrix"""
     for transformation in transformation_series:
         if not transformation.fixed_parameter:
             raise ValueError("Transformations need to be parameterized for matrix_manipulation.")
         transformation.transform_abstract_matrix(abstract_matrix)
 
+
 def manipulate_arc_task(arc_task: AbstractARCTask, transformation_series: list[Transformation]):
+    """manipulates the output matrices of all trials in a given task"""
     training_trials = arc_task.train
     test_trials = arc_task.test
     for trial in training_trials:
@@ -23,7 +27,9 @@ def manipulate_arc_task(arc_task: AbstractARCTask, transformation_series: list[T
     for trial in test_trials:
         manipulate_abstract_matrix(trial.output, transformation_series)
 
+
 def abstract_pair_to_matrix_pair(abstract_matrix_pair: AbstractMatrixPair) -> MatrixPair:
+    """converts an AbstractMatrixPair back to a regular MatrixPair"""
     matrix_pair = abstract_matrix_pair.to_matrix_pair()
     input_color_matrix = ColorMatrix(matrix_pair[0])
     output_color_matrix = ColorMatrix(matrix_pair[1])
@@ -31,6 +37,7 @@ def abstract_pair_to_matrix_pair(abstract_matrix_pair: AbstractMatrixPair) -> Ma
 
 
 def abstract_task_to_arc_task(abstract_task: AbstractARCTask) -> ARCTask:
+    """converts an AbstractARCTask back to a regular ARCTask"""
     abstract_train = abstract_task.train
     abstract_test = abstract_task.test
     train = []
@@ -43,12 +50,11 @@ def abstract_task_to_arc_task(abstract_task: AbstractARCTask) -> ARCTask:
     return ARCTask(train, test)
 
 
-
-
 def generate_test_task(template: AbstractARCTask,
                        series_length: int,
                        available_transformations: list[Transformation],
                        available_conditions: list[Condition]) -> tuple[AbstractARCTask, list[Transformation]]:
+    """generates a test task with a given length and a given set of transformations"""
     task = copy.deepcopy(template)
     series = []
     valid_conditions = []
@@ -58,7 +64,7 @@ def generate_test_task(template: AbstractARCTask,
     for _ in range(series_length):
         transformation = random.choice(available_transformations)
         parameter = random.choice(transformation.possible_parameters)
-        if valid_conditions and random.randint(1, 10) == 1: #10% chance
+        if valid_conditions and random.randint(1, 10) == 1:  # 10% chance
             parameterized_condition = random.choice(valid_conditions)
             parameterized = transformation.from_parameter_condition(parameter, parameterized_condition)
         else:
@@ -68,8 +74,9 @@ def generate_test_task(template: AbstractARCTask,
     manipulate_arc_task(task, series)
     return task, series
 
+
 def get_valid_conditions(template, available_conditions):
-    # extract actual feature values present in the template
+    """extracts all conditions that are valid for the given template"""
     valid = []
     if all(len(trial.input.abstract_objects) == 1 for trial in template.train):
         return valid
@@ -92,16 +99,19 @@ def get_valid_conditions(template, available_conditions):
                 valid.append(
                     ConditionPosition(ConditionPositionParameter(position[0], Axis.Vertical, SmallerOrLarger.larger)))
                 valid.append(
-                    ConditionPosition(ConditionPositionParameter(position[1], Axis.Horizontal, SmallerOrLarger.smaller)))
+                    ConditionPosition(
+                        ConditionPositionParameter(position[1], Axis.Horizontal, SmallerOrLarger.smaller)))
                 valid.append(
                     ConditionPosition(ConditionPositionParameter(position[1], Axis.Horizontal, SmallerOrLarger.larger)))
     return valid
+
 
 def generate_test_set(templates: list[AbstractARCTask],
                       series_lengths: list[int],
                       available_transformations: list[Transformation],
                       available_conditions: list[Condition],
                       tasks_per_combination: int) -> list[tuple[AbstractARCTask, list[Transformation]]]:
+    """generates a test set by randomly applying transformations to a given set of templates"""
     test_set = []
     for template in templates:
         for length in series_lengths:
@@ -110,12 +120,16 @@ def generate_test_set(templates: list[AbstractARCTask],
                 test_set.append((task, series))
     return test_set
 
+
 def apply_to_test_trials(task: AbstractARCTask, series: list[Transformation]):
+    """applies a series of transformations to all test trials of a given task"""
     test_trials = task.test
     for trial in test_trials:
         manipulate_abstract_matrix(trial.input, series)
 
+
 def transform_and_evaluate_test_trials(task: AbstractARCTask, series: list[Transformation]) -> bool:
+    """applies a series of transformations to all test trials of a given task and checks if the output matrices are equal to the input matrices"""
     task_copy = copy.deepcopy(task)
     apply_to_test_trials(task_copy, series)
     test_trials = task_copy.test

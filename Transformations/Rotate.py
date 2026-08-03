@@ -6,6 +6,7 @@ from Transformations.Transformation import Transformation, TransformationParamet
 from Transformations.Primitive_Transformations import rotate
 from Conditionals.Condition import *
 
+
 class RotationParameter(TransformationParameter):
 
     def __init__(self, degree: Degree):
@@ -18,16 +19,19 @@ class RotationParameter(TransformationParameter):
     def __repr__(self):
         return self.degree.name
 
+
 class Rotate(Transformation):
     possible_parameters = RotationParameter.possible_values()
 
     def __init__(self, parameter_degree: RotationParameter = None, condition: Optional[Condition] = None):
         super().__init__(parameter_degree, condition)
 
-    def from_parameter_condition(self, parameter: Optional[RotationParameter] = None, condition: Optional[Condition] = None) -> 'Rotate':
+    def from_parameter_condition(self, parameter: Optional[RotationParameter] = None,
+                                 condition: Optional[Condition] = None) -> 'Rotate':
         return Rotate(parameter, condition)
 
-    def transform_abstract_matrix(self, abstract_matrix: AbstractObjectMatrix, parameter_degree: Optional[RotationParameter] = None):
+    def transform_abstract_matrix(self, abstract_matrix: AbstractObjectMatrix,
+                                  parameter_degree: Optional[RotationParameter] = None):
         if parameter_degree is None:
             if self.fixed_parameter is None:
                 raise ValueError("Either degree or fixed_parameter must be specified")
@@ -38,7 +42,8 @@ class Rotate(Transformation):
             if self.condition is None or self.condition.applies_to(abstract_object):
                 rotate(abstract_object, parameter_degree.degree)
 
-    def transform_abstract_object(self, abstract_object: AbstractObject, parameter_degree: Optional[RotationParameter] = None):
+    def transform_abstract_object(self, abstract_object: AbstractObject,
+                                  parameter_degree: Optional[RotationParameter] = None):
         if parameter_degree is None:
             if self.fixed_parameter is None:
                 raise ValueError("Either degree or fixed_parameter must be specified")

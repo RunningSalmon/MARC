@@ -1,13 +1,9 @@
 import copy
 import heapq
 
-from Datatypes.Abstract_ARC_Task import AbstractMatrixPair
-from Transformations.Transformation import *
 from Evaluation.Matrix_Pair_Evaluation import *
-from Datatypes.Primitive_Datatypes import *
-from Evaluation.Feature_Color import *
-from Evaluation.Feature_Position import *
 from Evaluation.Feature_Shape import *
+
 
 class FeatureHeapItem:
     def __init__(self, score: float, feature: Feature, feature_mapping: dict):
@@ -18,6 +14,7 @@ class FeatureHeapItem:
     def __lt__(self, other):
         return self.score < other.score
 
+
 def check_paring_ambiguity(pairing: dict):
     """returns true if every object from the output matrix appears only once in the pairing"""
     paired_output_objects_indices = []
@@ -27,7 +24,12 @@ def check_paring_ambiguity(pairing: dict):
         paired_output_objects_indices.append(paired_idx)
     return True
 
+
 def create_object_mapping(abstract_matrix_pair: AbstractMatrixPair, eval_features: list[Feature]):
+    """
+    establishes an unambiguous mapping between input and output objects based on the given evaluation features
+    :returns: a dictionary mapping input object indices to output object indices
+    """
     input_matrix = abstract_matrix_pair.input
     output_matrix = abstract_matrix_pair.output
     input_objects = input_matrix.abstract_objects
@@ -35,8 +37,8 @@ def create_object_mapping(abstract_matrix_pair: AbstractMatrixPair, eval_feature
     matrix_shape = input_matrix.height, input_matrix.width
     feature_heap = []
 
-    #debug
-    #print(f"input objects: {len(input_objects)}, output objects: {len(output_objects)}")
+    # debug
+    # print(f"input objects: {len(input_objects)}, output objects: {len(output_objects)}")
 
     # 1 to 1 mapping (pairing)
     if len(input_objects) == len(output_objects):
@@ -48,7 +50,8 @@ def create_object_mapping(abstract_matrix_pair: AbstractMatrixPair, eval_feature
                 highest_score = 0
                 best_fit_idx2 = 0
                 for idx2 in range(len(output_objects)):
-                    score = evaluate_abstract_object_pair(input_objects[idx1], output_objects[idx2], [feature], abstract_matrix_pair)
+                    score = evaluate_abstract_object_pair(input_objects[idx1], output_objects[idx2], [feature],
+                                                          abstract_matrix_pair)
                     if score > highest_score:
                         highest_score = score
                         best_fit_idx2 = idx2
@@ -61,8 +64,8 @@ def create_object_mapping(abstract_matrix_pair: AbstractMatrixPair, eval_feature
                 heapq.heappush(feature_heap, FeatureHeapItem(overall_score, feature, feature_pairing))
                 counter += 1
 
-    # 1 to x mapping
-    #elif len(input_objects) > len(output_objects):
+    # 1 to x mapping #(deprecated)
+    # elif len(input_objects) > len(output_objects):
     #    feature_heap = []
     #    counter = 0
     #    for feature in eval_features:
@@ -95,6 +98,3 @@ def create_object_mapping(abstract_matrix_pair: AbstractMatrixPair, eval_feature
         return mapping
 
     return {}
-
-
-

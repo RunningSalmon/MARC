@@ -6,6 +6,7 @@ from Transformations.Transformation import Transformation, TransformationParamet
 from Transformations.Primitive_Transformations import translate
 from Conditionals.Condition import *
 
+
 class TranslateParameter(TransformationParameter):
 
     def __init__(self, direction: Direction):
@@ -25,10 +26,12 @@ class Translate(Transformation):
     def __init__(self, parameter_direction: TranslateParameter = None, condition: Optional[Condition] = None):
         super().__init__(parameter_direction, condition)
 
-    def from_parameter_condition(self, parameter: Optional[TranslateParameter] = None, condition: Optional[Condition] = None) -> 'Translate':
+    def from_parameter_condition(self, parameter: Optional[TranslateParameter] = None,
+                                 condition: Optional[Condition] = None) -> 'Translate':
         return Translate(parameter, condition)
 
-    def transform_abstract_matrix(self, abstract_matrix: AbstractObjectMatrix, parameter_direction: Optional[TranslateParameter] = None):
+    def transform_abstract_matrix(self, abstract_matrix: AbstractObjectMatrix,
+                                  parameter_direction: Optional[TranslateParameter] = None):
         if parameter_direction is None:
             if self.fixed_parameter is None:
                 raise ValueError("Either direction or fixed_parameter must be specified")
@@ -48,4 +51,3 @@ class Translate(Transformation):
 
         if self.condition is None or self.condition.applies_to(abstract_object):
             translate(abstract_object, parameter_direction.direction)
-

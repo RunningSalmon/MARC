@@ -27,6 +27,15 @@ def initialize_mdl_search(abstract_arc_task: AbstractARCTask,
                           eval_features: list[Feature],
                           statistics: list[SummaryStatistic],
                           conditions: list[Condition]):
+    """
+    sets up the heap for the MDL search and the list of primitive transformations
+    :arg abstract_arc_task: the task to be solved
+    :arg transformations: the list of transformation algorithms to be considered
+    :arg eval_features: the list of evaluation features for object based evaluation
+    :arg statistics: the list of summary statistics for statistics based evaluation
+    :arg conditions: the list of conditions to be considered in the search
+    :returns: a list of primitive transformations and the heap containing all initial transformation series
+    """
     training_pairs = abstract_arc_task.train
     heap = []
     primitive_transformations = []
@@ -91,18 +100,28 @@ def initialize_mdl_search(abstract_arc_task: AbstractARCTask,
     return heap, primitive_transformations
 
 
-def mdl_search_step(abstract_matrix_pair: AbstractARCTask,
+def mdl_search_step(abstract_arc_task: AbstractARCTask,
                     heap: list,
                     primitive_transformations: list,
                     visited: set,
                     eval_features: list[Feature],
                     statistics: list[SummaryStatistic],
                     conditions: list[Condition]) -> tuple[list, set]:
-
-    training_pairs: list[AbstractMatrixPair] = abstract_matrix_pair.train
+    """
+        pops the transformation series with the lowest MDL score from the heap and expands it with all possible transformations
+        :arg abstract_arc_task: the task to be solved
+        :arg heap: the heap containing up to 30 transformation series sorted by their MDL score
+        :arg primitive_transformations: the list of primitive transformations established in the initialization
+        :arg visited: the set of transformation series that have already been visited
+        :arg eval_features: the list of evaluation features for object based evaluation
+        :arg statistics: the list of summary statistics for statistics based evaluation
+        :arg conditions: the list of conditions to be considered in the search
+        :returns: the heap with all expanded transformation series added to it and the set of transformation series that have already been visited
+        """
+    training_pairs: list[AbstractMatrixPair] = abstract_arc_task.train
     item: HeapItem = heapq.heappop(heap)
     transforms: list[Transformation] = item.transforms
-    #print(f"Expanded: {item.transforms} with DL: {item.mdl}")
+    # print(f"Expanded: {item.transforms} with DL: {item.mdl}")
 
     # check if sequence already visited else append to visited
     key = tuple(repr(transform) for transform in transforms)
@@ -117,10 +136,10 @@ def mdl_search_step(abstract_matrix_pair: AbstractARCTask,
         anticipatory_matrices = []
         transform_scores = []
         possible_conditions = set()
-        for i, abstract_matrix_pair in enumerate(training_pairs):
+        for i, abstract_arc_task in enumerate(training_pairs):
             manipulatable_transformed_matrix = copy.deepcopy(
                 transformed_matrices[i])  # manipulatable matrix with current series applied
-            output_matrix = abstract_matrix_pair.output  # non-manipulatable output matrix for eval
+            output_matrix = abstract_arc_task.output  # non-manipulatable output matrix for eval
             manipulatable_transformed_pair = AbstractMatrixPair(manipulatable_transformed_matrix, output_matrix)
 
             if conditions:
@@ -163,9 +182,9 @@ def mdl_search_step(abstract_matrix_pair: AbstractARCTask,
                 conditioned_transformation.condition = condition
                 scores = []
                 anticipatory_matrices = []
-                for i, abstract_matrix_pair in enumerate(training_pairs):
+                for i, abstract_arc_task in enumerate(training_pairs):
                     manipulatable_transformed_matrix = copy.deepcopy(transformed_matrices[i])
-                    output_matrix = abstract_matrix_pair.output
+                    output_matrix = abstract_arc_task.output
                     manipulatable_transformed_pair = AbstractMatrixPair(manipulatable_transformed_matrix, output_matrix)
 
                     transform_param_results = transform_eval_matrix_pair(manipulatable_transformed_pair,
@@ -189,6 +208,7 @@ def mdl_search_step(abstract_matrix_pair: AbstractARCTask,
 
 
 def check_if_solved(abstract_arc_task: AbstractARCTask, heap_item: HeapItem):
+    """returns true if the given transformation series is a solution, else false"""
     transformed_matrices = heap_item.transformed_matrices
     training_pairs = abstract_arc_task.train
     for i, abstract_matrix_pair in enumerate(training_pairs):
@@ -205,6 +225,16 @@ def mdl_search(abstract_arc_task: AbstractARCTask,
                eval_features: list[Feature],
                statistics: list[SummaryStatistic],
                conditions: list[Condition]):
+    """
+    initializes and executes the MDL search for the given task. Prunes the heap to the 30 best items after every steps and returns a solution for all training trials if found.
+    :arg abstract_arc_task: the task to be solved
+    :arg transformations: the list of transformation algorithms to be considered
+    :arg eval_features: the list of evaluation features for object based evaluation
+    :arg statistics: the list of summary statistics for statistics based evaluation
+    :arg conditions: the list of conditions to be considered in the search
+    :returns: a series of transformations that solves the task, the number of steps it took to find a solution and the transformation series that were visited
+
+    """
     heap, primitive_transformations = initialize_mdl_search(abstract_arc_task, transformations, eval_features,
                                                             statistics, conditions)
     visited = set()
@@ -220,8 +250,8 @@ def mdl_search(abstract_arc_task: AbstractARCTask,
 
     while heap and step < max_step_nr:
         ## debug
-        #print_heap = copy.deepcopy(heap)
-        #while print_heap:
+        # print_heap = copy.deepcopy(heap)
+        # while print_heap:
         #    item = heapq.heappop(print_heap)
         #    print(f"heap in step {step}: mdl: {item.mdl}, nll: {item.nll}, transforms: {item.transforms}")
 
@@ -299,22 +329,24 @@ def transform_eval_matrix_pair(abstract_matrix_pair: AbstractMatrixPair,
                                eval_features: list[Feature],
                                statistics: list[SummaryStatistic]):
     manipulatable_input_matrix = copy.deepcopy(abstract_matrix_pair.input)  # manipulatable input matrix
-    transformation.transform_abstract_matrix(manipulatable_input_matrix, parameter) #transform manipulatable input matrix
+    transformation.transform_abstract_matrix(manipulatable_input_matrix,
+                                             parameter)  # transform manipulatable input matrix
     transformed_matrix_pair = AbstractMatrixPair(manipulatable_input_matrix, abstract_matrix_pair.output,
                                                  abstract_matrix_pair.mapping)
     if eval_features and check_for_object_mapping(transformed_matrix_pair, eval_features):  # per object evaluation
         score = obj_eval_abstract_matrix_pair(transformed_matrix_pair, eval_features)
     elif statistics:  # Summary stat evaluation
         score = sumstat_eval_abstract_matrix_pair(transformed_matrix_pair, statistics)
-    else: #no evaluation possible
+    else:  # no evaluation possible
         score = 0
 
     return score, manipulatable_input_matrix
 
 
 def check_for_object_mapping(abstract_matrix_pair: AbstractMatrixPair, eval_features: list[Feature]):
-    if not abstract_matrix_pair.mapping: #no existing pairing?
-        abstract_matrix_pair.mapping = create_object_mapping(abstract_matrix_pair, eval_features) #try to establish pairing and safe to Matrix-Pair
-        if not abstract_matrix_pair.mapping: #still not existing?
+    if not abstract_matrix_pair.mapping:  # no existing pairing?
+        abstract_matrix_pair.mapping = create_object_mapping(abstract_matrix_pair,
+                                                             eval_features)  # try to establish pairing and safe to Matrix-Pair
+        if not abstract_matrix_pair.mapping:  # still not existing?
             return False
     return True

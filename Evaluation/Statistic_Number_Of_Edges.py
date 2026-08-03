@@ -11,25 +11,26 @@ class NumberOfEdges(SummaryStatistic):
         output_edges = get_number_of_edges(output_matrix)
         if max(input_edges, output_edges) == 0:
             return 1
-        return min(input_edges, output_edges)/max(input_edges, output_edges)
+        return min(input_edges, output_edges) / max(input_edges, output_edges)
 
 
 def get_number_of_edges(matrix: np.ndarray) -> int:
+    """counts the number of neighboring pixels with different colors"""
     matrix_height = matrix.shape[0]
     matrix_width = matrix.shape[1]
     count_of_edges = 0
     for i, row in enumerate(matrix):
         for j, value in enumerate(row):
             if i > 0:
-                if matrix[i-1][j] != value:
+                if matrix[i - 1][j] != value:
                     count_of_edges += 1
-            if i < matrix_height-1:
-                if matrix[i+1][j] != value:
+            if i < matrix_height - 1:
+                if matrix[i + 1][j] != value:
                     count_of_edges += 1
             if j > 0:
-                if matrix[i][j-1] != value:
+                if matrix[i][j - 1] != value:
                     count_of_edges += 1
-            if j < matrix_width-1:
-                if matrix[i][j+1] != value:
+            if j < matrix_width - 1:
+                if matrix[i][j + 1] != value:
                     count_of_edges += 1
     return count_of_edges

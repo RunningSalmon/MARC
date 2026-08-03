@@ -3,7 +3,8 @@ from Evaluation.Feature import *
 from Evaluation.Summary_Statistic import SummaryStatistic
 
 
-def evaluate_abstract_object_pair(abstract_object_1: AbstractObject, abstract_object_2: AbstractObject, eval_features: list[Feature], abstract_matrix_pair: AbstractMatrixPair) -> float:
+def evaluate_abstract_object_pair(abstract_object_1: AbstractObject, abstract_object_2: AbstractObject,
+                                  eval_features: list[Feature], abstract_matrix_pair: AbstractMatrixPair) -> float:
     if len(eval_features) == 0:
         return 0
 
@@ -11,7 +12,8 @@ def evaluate_abstract_object_pair(abstract_object_1: AbstractObject, abstract_ob
     for feature in eval_features:
         score += feature.evaluate_objects(abstract_object_1, abstract_object_2, abstract_matrix_pair)
 
-    return score/len(eval_features)
+    return score / len(eval_features)
+
 
 def obj_eval_abstract_matrix_pair(abstract_matrix_pair: AbstractMatrixPair, eval_features: list[Feature]):
     if len(eval_features) == 0:
@@ -21,9 +23,11 @@ def obj_eval_abstract_matrix_pair(abstract_matrix_pair: AbstractMatrixPair, eval
     for feature in eval_features:
         score += feature.evaluate_abstract_matrix_pair(abstract_matrix_pair)
 
-    return score/len(eval_features)
+    return score / len(eval_features)
 
-def sumstat_eval_abstract_matrix_pair(abstract_matrix_pair: AbstractMatrixPair, statistics: list[SummaryStatistic]) -> float:
+
+def sumstat_eval_abstract_matrix_pair(abstract_matrix_pair: AbstractMatrixPair,
+                                      statistics: list[SummaryStatistic]) -> float:
     if len(statistics) == 0:
         return 0
 

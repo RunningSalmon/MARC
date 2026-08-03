@@ -10,7 +10,8 @@ class NumberOfObjects(SummaryStatistic):
         number_of_output_objects = count_visible_objects(abstract_matrix_pair.output)
         if max(number_of_input_objects, number_of_output_objects) == 0:
             return 1
-        return min(number_of_input_objects, number_of_output_objects) / max(number_of_input_objects, number_of_output_objects)
+        return min(number_of_input_objects, number_of_output_objects) / max(number_of_input_objects,
+                                                                            number_of_output_objects)
 
 
 def count_visible_objects(abstract_matrix) -> int:

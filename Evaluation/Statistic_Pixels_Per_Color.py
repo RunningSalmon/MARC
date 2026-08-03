@@ -12,4 +12,4 @@ class PixelsPerColor(SummaryStatistic):
             input_count = np.sum(input_matrix == color.value)
             output_count = np.sum(output_matrix == color.value)
             overlapping_count += min(input_count, output_count)
-        return float(overlapping_count/input_matrix.size)
+        return float(overlapping_count / input_matrix.size)

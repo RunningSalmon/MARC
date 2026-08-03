@@ -1,6 +1,11 @@
 from Transformations.Primitive_Transformations import *
 
+
 def eval_shape_matrix(matrix_1: np.ndarray, matrix_2: np.ndarray):
+    """
+    compares two shape matrices
+    :returns: the number of identical values at identical coordinates divided by the total number of values
+    """
     matrix_1_shape = matrix_1.shape
     matrix_2_shape = matrix_2.shape
     min_height = min(matrix_1_shape[0], matrix_2_shape[0])
@@ -15,9 +20,11 @@ def eval_shape_matrix(matrix_1: np.ndarray, matrix_2: np.ndarray):
             if matrix_1[i][j] == matrix_2[i][j]:
                 similarity_count += 1
 
-    return similarity_count/(max_height*max_width)
+    return similarity_count / (max_height * max_width)
+
 
 def eval_shape_duplicated(obj_1: AbstractObject, obj_2: AbstractObject):
+    """evaluates two shapes by duplicating them and comparing the resulting shape matrices"""
     obj_1_shape_matrix = obj_1.Shape_Matrix
     obj_2_shape_matrix = obj_2.Shape_Matrix
     fitness = []
@@ -40,7 +47,9 @@ def eval_shape_duplicated(obj_1: AbstractObject, obj_2: AbstractObject):
 
     return max(fitness)
 
+
 def eval_rotated_shape(obj_1: AbstractObject, obj_2: AbstractObject):
+    """evaluates two shapes by rotating them and comparing the resulting shape matrices"""
     obj_1_shape_matrix = obj_1.Shape_Matrix
     obj_2_shape_matrix = obj_2.Shape_Matrix
     fitness = []
@@ -57,7 +66,9 @@ def eval_rotated_shape(obj_1: AbstractObject, obj_2: AbstractObject):
 
     return max(fitness)
 
+
 def eval_mirrored_shape(obj_1: AbstractObject, obj_2: AbstractObject):
+    """evaluates two shapes by mirroring them and comparing the resulting shape matrices"""
     obj_1_shape_matrix = obj_1.Shape_Matrix
     obj_2_shape_matrix = obj_2.Shape_Matrix
     fitness = []

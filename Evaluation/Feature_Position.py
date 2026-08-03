@@ -2,8 +2,9 @@ from typing import override
 
 from Evaluation.Feature import *
 
+
 class FeaturePosition(Feature):
-    matrix_shape: tuple[int,int]
+    matrix_shape: tuple[int, int]
 
     @ensure(lambda result: 0 <= result <= 1)
     def evaluate_objects(self, abstract_object_1: AbstractObject, abstract_object_2: AbstractObject,

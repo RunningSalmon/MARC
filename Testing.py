@@ -56,13 +56,15 @@ class Transformations(Enum):
     tra_right = Translate(TranslateParameter(Direction.Right))
 
 
-
-def run_on_task(task: AbstractARCTask, transforms: list[Transformation], eval_features: list[Feature], statistics: list[SummaryStatistic], conditions: list[Condition]):
+def run_on_task(task: AbstractARCTask, transforms: list[Transformation], eval_features: list[Feature],
+                statistics: list[SummaryStatistic], conditions: list[Condition]):
     solution, visited, steps = mdl_search(task, transforms, eval_features, statistics, conditions)
     is_correct = transform_and_evaluate_test_trials(task, solution)
     return solution, is_correct, steps
 
-def run_on_multiple_tasks(tasks: list[AbstractARCTask], transforms: list[Transformation], eval_features: list[Feature], statistics: list[SummaryStatistic], conditions: list[Condition]):
+
+def run_on_multiple_tasks(tasks: list[AbstractARCTask], transforms: list[Transformation], eval_features: list[Feature],
+                          statistics: list[SummaryStatistic], conditions: list[Condition]):
     solutions = []
     correct_solutions_found = []
     steps = []
@@ -72,6 +74,7 @@ def run_on_multiple_tasks(tasks: list[AbstractARCTask], transforms: list[Transfo
         correct_solutions_found.append(is_correct)
         steps.append(task_steps)
     return solutions, correct_solutions_found, steps
+
 
 if __name__ == '__main__':
     # basic_matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
@@ -98,29 +101,28 @@ if __name__ == '__main__':
     # recolor(abstract_object, ArcColor.Azure)
     # print(abstract_object)
 
-    #task = load_arc_task_from_json("Rotate90+DuplicateDown.json", "ARC_Generator_JSONs")
-    #abstracted_task = task.to_abstract_task()
-    #print(task)
-    #print(abstracted_task)
-    #first_input_color_matrix = task.test[0].input
-    #print(first_input_color_matrix)
+    # task = load_arc_task_from_json("Rotate90+DuplicateDown.json", "ARC_Generator_JSONs")
+    # abstracted_task = task.to_abstract_task()
+    # print(task)
+    # print(abstracted_task)
+    # first_input_color_matrix = task.test[0].input
+    # print(first_input_color_matrix)
     #
-    #transformations = [Recolor(),
+    # transformations = [Recolor(),
     #                   Translate(),
     #                   Duplicate(),
     #                   Mirror(),
     #                   Rotate()]
 
-
-    #train = abstracted_task.train
-    #for matrix_pair in train:
+    # train = abstracted_task.train
+    # for matrix_pair in train:
     #    matrix_pair.pairing = create_object_mapping(matrix_pair, eval_features, transformations)
     #    Rotate().transform(matrix_pair.input, RotationParameter(Degree.Deg90))
     #    print(matrix_pair)
     #    score_shape = evaluate_abstract_matrix_pair(matrix_pair, [FeatureShape()])
     #    print(score_shape)
 
-    #template_task = load_arc_task_from_json("simple_abstraction_example.json", "ARC_Generator_JSONs")
+    # template_task = load_arc_task_from_json("simple_abstraction_example.json", "ARC_Generator_JSONs")
     template_1 = load_arc_task_from_json("T1.json", "ARC_Generator_JSONs").to_abstract_task()
     template_2 = load_arc_task_from_json("T2.json", "ARC_Generator_JSONs").to_abstract_task()
     template_3 = load_arc_task_from_json("T3.json", "ARC_Generator_JSONs").to_abstract_task()
@@ -128,61 +130,59 @@ if __name__ == '__main__':
     template_5 = load_arc_task_from_json("T5.json", "ARC_Generator_JSONs").to_abstract_task()
     # print(template_task_1)
     template_task = template_1.to_abstract_task()
-    #template_task.to_matplot()
+    # template_task.to_matplot()
     rot_90_conditioned = copy.deepcopy(Transformations.rot90.value)
     rot_90_conditioned.condition = ConditionColor(ConditionColorParameter(ArcColor(4)))
     manipulations = [Transformations.rot90.value]
     eval_features = [FeatureColor(),
-                    FeaturePosition(),
-                    FeatureShape()]
+                     FeaturePosition(),
+                     FeatureShape()]
     statistics = [NumberOfEdges(),
                   NumberOfObjects(),
                   PixelsCorrect(),
-                  PixelsPerColor(),]
+                  PixelsPerColor(), ]
     transforms = [Duplicate(),
                   Mirror(),
                   Recolor(),
                   Rotate(),
-                  Translate(),]
+                  Translate(), ]
     conditions = [ConditionColor(),
                   ConditionPosition(),
-                  ConditionShape(),]
-    #conditions = []
-    #test_set = generate_test_set([template_5], [3], transforms, conditions,1)
+                  ConditionShape(), ]
+    # conditions = []
+    # test_set = generate_test_set([template_5], [3], transforms, conditions,1)
     manipulate_arc_task(template_task, manipulations)
-    #print(abstract_task_to_arc_task(test_set[0][0]), test_set[0][1])
-    #solution, visited, steps = mdl_search(template_task, transforms, eval_features, statistics, conditions)
+    # print(abstract_task_to_arc_task(test_set[0][0]), test_set[0][1])
+    # solution, visited, steps = mdl_search(template_task, transforms, eval_features, statistics, conditions)
     template_task.to_matplot()
-    #print(f"found solution:\n {solution}\n in {steps} steps. \nvisited:\n{visited}")
+    # print(f"found solution:\n {solution}\n in {steps} steps. \nvisited:\n{visited}")
 
-    #test_matrix_pair = template_task_1.train[0]
-    #test_matrix_pair.pairing = create_object_mapping(test_matrix_pair, eval_features, transformations)
-    #print(abstract_pair_to_matrix_pair(test_matrix_pair))
-    #score = FeatureShape().evaluate_abstract_matrix_pair(test_matrix_pair)
-    #print(score)
+    # test_matrix_pair = template_task_1.train[0]
+    # test_matrix_pair.pairing = create_object_mapping(test_matrix_pair, eval_features, transformations)
+    # print(abstract_pair_to_matrix_pair(test_matrix_pair))
+    # score = FeatureShape().evaluate_abstract_matrix_pair(test_matrix_pair)
+    # print(score)
     ##manipulate_abstract_matrix(test_matrix_pair.input, [Rotate(RotationParameter(Degree.Deg90))])
-    #manipulate_abstract_matrix(test_matrix_pair.input, [Mirror(MirrorParameter(Axis.Horizontal))])
-    #score = evaluate_abstract_matrix_pair(test_matrix_pair, eval_features)
-    #print(score)
+    # manipulate_abstract_matrix(test_matrix_pair.input, [Mirror(MirrorParameter(Axis.Horizontal))])
+    # score = evaluate_abstract_matrix_pair(test_matrix_pair, eval_features)
+    # print(score)
 
-    #mappings = []
-    #for matrix_pair in template_task_1.train:
+    # mappings = []
+    # for matrix_pair in template_task_1.train:
     #    mappings.append(create_object_mapping(matrix_pair, eval_features))
     # print(mappings)
 
-    #solution, visited, steps = mdl_search(test_set[0][0], transforms, eval_features, statistics, conditions)
-    #print(f"found solution:\n {solution}\n in {steps} steps. \nvisited:\n{visited}")
-    #if solution:
+    # solution, visited, steps = mdl_search(test_set[0][0], transforms, eval_features, statistics, conditions)
+    # print(f"found solution:\n {solution}\n in {steps} steps. \nvisited:\n{visited}")
+    # if solution:
     #    correct_solution = transform_and_evaluate_test_trials(test_set[0][0], solution)
     #    print(f"correct solution: {correct_solution}")
 
+    # print(first_input)
+    # print(ColorMatrix(first_input.to_matrix()))
 
+    # transformation = Mirror()
 
-    #print(first_input)
-    #print(ColorMatrix(first_input.to_matrix()))
-
-    #transformation = Mirror()
-
-    #transformation.transform(first_input, MirrorParameter(Axis.Vertical))
-    #print(first_input)
-    #print(ColorMatrix(first_input.to_matrix()))
+    # transformation.transform(first_input, MirrorParameter(Axis.Vertical))
+    # print(first_input)
+    # print(ColorMatrix(first_input.to_matrix()))

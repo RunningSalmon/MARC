@@ -1,6 +1,8 @@
 import numpy as np
 
 from Datatypes.Primitive_Datatypes import *
+
+
 class AbstractObject:
     Shape_Matrix: np.ndarray
     Color: ArcColor
@@ -12,7 +14,7 @@ class AbstractObject:
         top_left_y, top_left_x = position
         height, width = shape.shape
 
-        # Geometrischer Mittelpunkt der Bounding Box (kann .5 sein bei gerader Höhe/Breite)
+        # center point of the object (can be a decimal)
         self.Center_Y = top_left_y + (height - 1) / 2
         self.Center_X = top_left_x + (width - 1) / 2
         self.Shape_Matrix = shape
@@ -20,23 +22,25 @@ class AbstractObject:
 
     @property
     def Position_X(self) -> int:
-        """Top-left X, abgeleitet aus Center_X und der aktuellen Shape-Breite."""
+        """top left X, derived from the center X and the shape width."""
         width = self.Shape_Matrix.shape[1]
         return round(self.Center_X - (width - 1) / 2)
 
     @property
     def Position_Y(self) -> int:
-        """Top-left Y, abgeleitet aus Center_Y und der aktuellen Shape-Höhe."""
+        """top left Y, derived from the center Y and the shape height."""
         height = self.Shape_Matrix.shape[0]
         return round(self.Center_Y - (height - 1) / 2)
 
     @Position_X.setter
     def Position_X(self, value: int):
+        """sets the top left X to the given value, and adjusts the center X accordingly."""
         width = self.Shape_Matrix.shape[1]
         self.Center_X = value + (width - 1) / 2
 
     @Position_Y.setter
     def Position_Y(self, value: int):
+        """sets the top left Y to the given value, and adjusts the center Y accordingly."""
         height = self.Shape_Matrix.shape[0]
         self.Center_Y = value + (height - 1) / 2
 

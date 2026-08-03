@@ -29,7 +29,7 @@ TEST_SET_DIR.mkdir(exist_ok=True)
 
 def arc_task_to_json_dict(arc_task) -> dict:
     """Convert an ARCTask (raw ColorMatrix-based) into the same dict shape
-    load_arc_task_from_json expects, so it round-trips."""
+    load_arc_task_from_json expects."""
     return {
         "train": [
             {"input": pair.input.matrix.tolist(), "output": pair.output.matrix.tolist()}
@@ -42,39 +42,12 @@ def arc_task_to_json_dict(arc_task) -> dict:
     }
 
 
-def check_roundtrip_integrity(task, raw_arc_task, task_id):
-    """Diagnostic: compares object counts (and, on mismatch, shapes/colors) between
-    the abstract task straight out of generate_test_task and the same task after
-    rasterizing to pixels and re-extracting objects via BFS. A mismatch here means
-    the JSON round-trip is silently changing task difficulty (e.g. merging adjacent
-    same-colored objects, or clipping objects at the matrix border)."""
-    reextracted = raw_arc_task.to_abstract_task()
-
-    mismatches = []
-    for split_name, original_pairs, reext_pairs in [
-        ("train", task.train, reextracted.train),
-        ("test", task.test, reextracted.test),
-    ]:
-        for i, (orig_pair, reext_pair) in enumerate(zip(original_pairs, reext_pairs)):
-            for side_name, orig_matrix, reext_matrix in [
-                ("input", orig_pair.input, reext_pair.input),
-                ("output", orig_pair.output, reext_pair.output),
-            ]:
-                orig_n = len(orig_matrix.abstract_objects)
-                reext_n = len(reext_matrix.abstract_objects)
-                if orig_n != reext_n:
-                    mismatches.append(
-                        f"{task_id} {split_name}[{i}].{side_name}: "
-                        f"{orig_n} objects before roundtrip, {reext_n} after"
-                    )
-    return mismatches
-
-
 def build_task_id(template_name: str, series_length: int, repetition: int) -> str:
     return f"{template_name}_L{series_length}_rep{repetition}"
 
 
 def main():
+    """generates a test-set with a given seed, and saves it to test_sets/test_set{seed}.json"""
     templates = {
         name: load_arc_task_from_json(f"{name}.json", str(TEMPLATES_DIR)).to_abstract_task()
         for name in TEMPLATE_NAMES
@@ -94,9 +67,6 @@ def main():
             for repetition, (task, series) in enumerate(single_template_set):
                 task_id = build_task_id(template_name, length, repetition)
                 raw_arc_task = abstract_task_to_arc_task(task)
-
-                mismatches = check_roundtrip_integrity(task, raw_arc_task, task_id)
-                all_mismatches.extend(mismatches)
 
                 entries.append({
                     "task_id": task_id,

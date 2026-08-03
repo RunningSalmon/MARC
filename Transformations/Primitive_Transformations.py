@@ -1,8 +1,8 @@
-
 import numpy as np
 
 from Datatypes.Abstract_Object import *
 from Datatypes.Primitive_Datatypes import *
+
 
 def translate(abstract_object: AbstractObject, direction: Direction):
     match direction:
@@ -19,16 +19,20 @@ def translate(abstract_object: AbstractObject, direction: Direction):
 def mirror_matrix(matrix: np.ndarray, axis: Axis):
     return np.flip(matrix, axis.value)
 
+
 def mirror(abstract_object: AbstractObject, axis: Axis):
     shape_matrix = abstract_object.Shape_Matrix
     abstract_object.Shape_Matrix = mirror_matrix(shape_matrix, axis)
 
+
 def rotate_matrix(matrix: np.ndarray, degree: Degree):
     return np.rot90(matrix, degree.value)
+
 
 def rotate(abstract_object: AbstractObject, degree: Degree):
     shape_matrix = abstract_object.Shape_Matrix
     abstract_object.Shape_Matrix = rotate_matrix(shape_matrix, degree)
+
 
 def duplicate_matrix(matrix: np.ndarray, direction: Direction):
     duplicate_direction = None
@@ -36,9 +40,10 @@ def duplicate_matrix(matrix: np.ndarray, direction: Direction):
         duplicate_direction = (2, 1)
 
     elif direction == Direction.Left or direction == Direction.Right:
-        duplicate_direction = (1,2)
+        duplicate_direction = (1, 2)
 
     return np.tile(matrix, duplicate_direction)
+
 
 def duplicate(abstract_object: AbstractObject, direction: Direction):
     height, width = abstract_object.Shape_Matrix.shape
@@ -55,6 +60,7 @@ def duplicate(abstract_object: AbstractObject, direction: Direction):
     # Re-apply explicitly: setter now uses the NEW (already-tiled) shape dims
     abstract_object.Position_Y = top_left_y
     abstract_object.Position_X = top_left_x
+
 
 def recolor(abstract_object: AbstractObject, color: ArcColor):
     abstract_object.Color = color

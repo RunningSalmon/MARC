@@ -1,4 +1,3 @@
-
 """
 Extract a single ARC task from a generated test set, given its template,
 series length, and repetition (i.e. its task_id).
@@ -38,11 +37,11 @@ TEST_SET_DIR = Path("test_sets")
 
 
 def build_task_id(template_name: str, series_length: int, repetition: int) -> str:
-    """Must stay in sync with the naming scheme used in generate_test_set.py."""
     return f"{template_name}_L{series_length}_rep{repetition}"
 
 
 def load_test_set(seed: int, test_set_dir: Path = TEST_SET_DIR) -> list[dict]:
+    """loads a test set with a given seed"""
     path = test_set_dir / f"test_set{seed}.json"
     if not path.exists():
         raise FileNotFoundError(f"No test set found at {path}")
@@ -51,6 +50,7 @@ def load_test_set(seed: int, test_set_dir: Path = TEST_SET_DIR) -> list[dict]:
 
 
 def find_entry(entries: list[dict], task_id: str) -> dict:
+    """finds the entry with the given task_id in the given list of entries"""
     for entry in entries:
         if entry["task_id"] == task_id:
             return entry
@@ -59,12 +59,12 @@ def find_entry(entries: list[dict], task_id: str) -> dict:
 
 
 def extract_task(
-    seed: int,
-    task_id: str | None = None,
-    template: str | None = None,
-    series_length: int | None = None,
-    repetition: int | None = None,
-    test_set_dir: Path = TEST_SET_DIR,
+        seed: int,
+        task_id: str | None = None,
+        template: str | None = None,
+        series_length: int | None = None,
+        repetition: int | None = None,
+        test_set_dir: Path = TEST_SET_DIR,
 ) -> dict:
     """
     Returns the full entry (task_id, template, series_length, repetition,
@@ -84,20 +84,15 @@ def extract_task(
 
 
 def extract_task_as_arc_task(
-    seed: int,
-    task_id: str | None = None,
-    template: str | None = None,
-    series_length: int | None = None,
-    repetition: int | None = None,
-    test_set_dir: Path = TEST_SET_DIR,
+        seed: int,
+        task_id: str | None = None,
+        template: str | None = None,
+        series_length: int | None = None,
+        repetition: int | None = None,
+        test_set_dir: Path = TEST_SET_DIR,
 ):
     """
     Same lookup as extract_task(), but returns a real ARCTask object
-    (via the project's own load_arc_task_from_json) instead of a plain dict,
-    so you can call e.g. .to_abstract_task().to_matplot() on it directly.
-
-    Requires this script to be run/imported from within the MARC project
-    (so that Datatypes.ARC_Task is importable).
     """
     from Datatypes.ARC_Task import load_arc_task_from_json  # local import: only needed here
 
@@ -117,51 +112,7 @@ def print_matrix(matrix: list[list[int]]) -> None:
         print(" ".join(str(cell) for cell in row))
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Extract a single ARC task from a test set.")
-    parser.add_argument("--seed", type=int, required=True, help="Seed used when generating the test set (determines test_set{SEED}.json).")
-    parser.add_argument("--task_id", type=str, default=None, help="e.g. T2_L3_rep1")
-    parser.add_argument("--template", type=str, default=None, help="e.g. T2 (used together with --series_length and --repetition)")
-    parser.add_argument("--series_length", type=int, default=None)
-    parser.add_argument("--repetition", type=int, default=None)
-    parser.add_argument("--output", type=str, default=None, help="If set, writes the extracted ARC task (train/test only) to this path.")
-    parser.add_argument("--show_series", action="store_true", help="Print the ground truth transformation series.")
-    parser.add_argument("--show_matrices", action="store_true", help="Pretty-print all train/test matrices to stdout.")
-    args = parser.parse_args()
-
-    entry = extract_task(
-        seed=args.seed,
-        task_id=args.task_id,
-        template=args.template,
-        series_length=args.series_length,
-        repetition=args.repetition,
-    )
-
-    print(f"Found task: {entry['task_id']} (template={entry['template']}, "
-          f"series_length={entry['series_length']}, repetition={entry['repetition']})")
-
-    if args.show_series:
-        print("Ground truth series:")
-        for step in entry["ground_truth_series"]:
-            print(" ", step)
-
-    if args.show_matrices:
-        for split in ("train", "test"):
-            for i, pair in enumerate(entry["task"][split]):
-                print(f"\n--- {split}[{i}].input ---")
-                print_matrix(pair["input"])
-                print(f"--- {split}[{i}].output ---")
-                print_matrix(pair["output"])
-
-    if args.output:
-        out_path = Path(args.output)
-        out_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(out_path, "w") as f:
-            json.dump(entry["task"], f, indent=2)
-        print(f"\nSaved ARC task (train/test only) to {out_path}")
-
-
 if __name__ == "__main__":
     arc_task = extract_task_as_arc_task(seed=128, task_id="T3_L5_rep0")
     arc_task.to_abstract_task().to_matplot()
-    print(arc_task)
+    # print(arc_task)

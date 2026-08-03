@@ -19,16 +19,19 @@ class DuplicationParameter(TransformationParameter):
     def __repr__(self):
         return self.direction.name
 
+
 class Duplicate(Transformation):
     possible_parameters = DuplicationParameter.possible_values()
 
     def __init__(self, direction: DuplicationParameter = None, condition: Optional[Condition] = None):
         super().__init__(direction, condition)
 
-    def from_parameter_condition(self, parameter: Optional[TransformationParameter] = None, condition: Optional[Condition] = None) -> 'Duplicate':
+    def from_parameter_condition(self, parameter: Optional[TransformationParameter] = None,
+                                 condition: Optional[Condition] = None) -> 'Duplicate':
         return Duplicate(parameter, condition)
 
-    def transform_abstract_matrix(self, abstract_matrix: AbstractObjectMatrix, parameter_direction: Optional[DuplicationParameter] = None):
+    def transform_abstract_matrix(self, abstract_matrix: AbstractObjectMatrix,
+                                  parameter_direction: Optional[DuplicationParameter] = None):
         if parameter_direction is None:
             if self.fixed_parameter is None:
                 raise ValueError("Either direction or fixed_parameter must be specified")
@@ -36,9 +39,10 @@ class Duplicate(Transformation):
                 parameter_direction = self.fixed_parameter
 
         for abstract_object in abstract_matrix.abstract_objects:
-                self.transform_abstract_object(abstract_object, parameter_direction)
+            self.transform_abstract_object(abstract_object, parameter_direction)
 
-    def transform_abstract_object(self, abstract_object: AbstractObject, parameter_direction: Optional[DuplicationParameter] = None):
+    def transform_abstract_object(self, abstract_object: AbstractObject,
+                                  parameter_direction: Optional[DuplicationParameter] = None):
         if parameter_direction is None:
             if self.fixed_parameter is None:
                 raise ValueError("Either direction or fixed_parameter must be specified")

@@ -10,19 +10,18 @@ TEMPLATES = ['T1', 'T2', 'T3', 'T4', 'T5']
 SERIES_LENGTHS = [1, 3, 5]
 COLORS = ['blue', 'orange', 'green', 'red', 'purple']
 LINESTYLES = ['-', '--', '-.', ':', (0, (3, 1, 1, 1))]
-SEED = 12
+SEED = 128
 
 
 def load_results(config_name):
+    """Loads the task results from the JSON file with the naming convention 'config_name' + 'SEED'."""
     path = RESULTS_DIR / f"{config_name}{SEED}.json"
     with open(path) as f:
         return json.load(f)
 
 
 def aggregate(task_results):
-    """Turn the flat list of per-task results back into the
-    {template: {series_length: {'solved':.., 'total':.., 'steps':[...], 'failure_reasons': {...}}}}
-    shape needed for plotting (failure_reasons is extra, kept for the discussion section)."""
+    """Turns the flat task results into a format required for plotting."""
     agg = {t: {l: {'solved': 0, 'total': 0, 'steps': [], 'failure_reasons': {}} for l in SERIES_LENGTHS}
            for t in TEMPLATES}
     for r in task_results:
@@ -38,6 +37,7 @@ def aggregate(task_results):
 
 
 def plot_results(results, config_name):
+    """Plots the results for each template and series length."""
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(7, 10))
 
     for template, color, ls in zip(TEMPLATES, COLORS, LINESTYLES):

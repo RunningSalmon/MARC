@@ -9,4 +9,4 @@ class PixelsCorrect(SummaryStatistic):
         input_matrix = abstract_matrix_pair.input.to_matrix()
         output_matrix = abstract_matrix_pair.output.to_matrix()
         pixels_correct = int(np.sum(input_matrix == output_matrix))
-        return pixels_correct/input_matrix.size
+        return pixels_correct / input_matrix.size

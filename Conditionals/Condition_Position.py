@@ -5,6 +5,7 @@ from typing import Optional
 from Datatypes.Primitive_Datatypes import Axis, SmallerOrLarger
 from .Condition import *
 
+
 class ConditionPositionParameter(ConditionParameter):
     def __init__(self, threshold: int, axis: Axis, comparator: SmallerOrLarger):
         self.threshold = threshold
@@ -13,6 +14,7 @@ class ConditionPositionParameter(ConditionParameter):
 
     def __repr__(self):
         return f"all positions {self.comparator.name} than {self.threshold} on the {self.axis.name} axis"
+
 
 class ConditionPosition(Condition):
     def __init__(self, parameter_position: Optional[ConditionPositionParameter] = None):
@@ -27,7 +29,8 @@ class ConditionPosition(Condition):
         else:
             return object_position >= self.fixed_parameter.threshold
 
-    def explains_grouping(self, affected_group: list[AbstractObject], unaffected_group: list[AbstractObject]) -> list['ConditionPosition']:
+    def explains_grouping(self, affected_group: list[AbstractObject], unaffected_group: list[AbstractObject]) -> list[
+        'ConditionPosition']:
         if not affected_group or not unaffected_group:
             return []
         possible_explanations = []
@@ -42,11 +45,11 @@ class ConditionPosition(Condition):
         max_x_unaffected = max(unaffected_obj.Position_X for unaffected_obj in unaffected_group)
         max_y_unaffected = max(unaffected_obj.Position_Y for unaffected_obj in unaffected_group)
 
-        if min_x_affected > max_x_unaffected: #all objects have x_unaffected > x >= x_affected
+        if min_x_affected > max_x_unaffected:  # all objects have x_unaffected > x >= x_affected
             possible_explanations.append(
                 ConditionPosition(ConditionPositionParameter(min_x_affected, Axis.Horizontal, SmallerOrLarger.larger)))
 
-        if min_y_affected > max_y_unaffected: #all objects have y_unaffected > y >= y_affected
+        if min_y_affected > max_y_unaffected:  # all objects have y_unaffected > y >= y_affected
             possible_explanations.append(
                 ConditionPosition(ConditionPositionParameter(min_y_affected, Axis.Vertical, SmallerOrLarger.larger)))
 

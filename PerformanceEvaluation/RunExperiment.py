@@ -37,6 +37,7 @@ conditions = [ConditionColor(), ConditionPosition(), ConditionShape()]
 
 
 def load_test_set(name=f"test_set{SEED}.json"):
+    """loads test_set + 'SEED' from the test_sets directory."""
     with open(TEST_SET_DIR / name) as f:
         return json.load(f)
 
@@ -53,6 +54,7 @@ def json_dict_to_arc_task(task_dict: dict) -> ARCTask:
 
 
 def classify_failure(solution, steps, solved_on_test):
+    """labels the failure reason of a solution."""
     if solution is None:
         if steps >= MAX_STEPS:
             return "step_limit_reached"
@@ -63,6 +65,7 @@ def classify_failure(solution, steps, solved_on_test):
 
 
 def run_configuration(test_set_entries, transforms, eval_features, statistics, conditions, config_name):
+    """runs the search for each task in the test set with the given configuration."""
     task_results = []
 
     for entry in test_set_entries:
@@ -94,6 +97,7 @@ def run_configuration(test_set_entries, transforms, eval_features, statistics, c
 
 
 def save_results(task_results, config_name):
+    """saves the task results to a JSON file with the naming convention 'config_name' + 'SEED'."""
     path = RESULTS_DIR / f"{config_name}{SEED}.json"
     with open(path, "w") as f:
         json.dump(task_results, f, indent=2)

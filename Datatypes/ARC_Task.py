@@ -36,6 +36,10 @@ class ColorMatrix:
         return self.matrix.shape
 
     def extract_abstract_objects(self):
+        """
+        Extracts all objects from the matrix and returns a list of AbstractObjects
+        :returns: the objects found in the matrix
+        """
         matrix = copy.deepcopy(self.matrix)
         matrix_height, matrix_width = self.shape()
         objects = []
@@ -62,26 +66,31 @@ class ColorMatrix:
 
                         if current_row > 0:
                             to_visit.append((current_row - 1, current_col))
-                        if current_row < matrix_height-1:
+                        if current_row < matrix_height - 1:
                             to_visit.append((current_row + 1, current_col))
                         if current_col > 0:
                             to_visit.append((current_row, current_col - 1))
-                        if current_col < matrix_width-1:
+                        if current_col < matrix_width - 1:
                             to_visit.append((current_row, current_col + 1))
                 object_shape = np.zeros((row_max - row_min + 1, col_max - col_min + 1))
                 for x, y in obj_coordinates:
                     object_shape[x - row_min][y - col_min] = 1
                 abstract_object = AbstractObject((row_min, col_min), object_shape, ArcColor(obj_color))
-                #print(f"Found object: color={obj_color}, pos=({row_min},{col_min}), shape={object_shape.shape}")
+                # print(f"Found object: color={obj_color}, pos=({row_min},{col_min}), shape={object_shape.shape}")
                 objects.append(abstract_object)
 
         return objects
 
     def to_abstract_matrix(self):
+        """
+        turns the matrix into an AbstractObjectMatrix by extracting all objects from it
+        :returns: An AbstractObjectMatrix with the extracted objects and the shape of the original matrix
+        """
         objects = self.extract_abstract_objects()
         height, width = self.shape()
         abstract_matrix = AbstractObjectMatrix(height, width, objects)
         return abstract_matrix
+
 
 @dataclass
 class MatrixPair:
@@ -126,7 +135,7 @@ class ARCTask:
         return AbstractARCTask(train, test)
 
 
-def load_arc_task_from_json(json_file: str, path = str) -> ARCTask:
+def load_arc_task_from_json(json_file: str, path=str) -> ARCTask:
     """Load a MatrixDataset from an ARC_Problem_Interface JSON file."""
 
     with open(f"{path}/{json_file}", "r") as f:
